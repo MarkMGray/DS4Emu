@@ -29,7 +29,7 @@ if(mouseMoved) {
 	rightY /= 10;
 	if(fabs(rightX) > 0.1 || fabs(rightY) > 0.1) {
 		NSLog(@"Still decaying... %f %f", rightX, rightY);
-		[self decayKick];
+		//[self decayKick];
 	} else {
 		rightX = rightY = 0;
 	}

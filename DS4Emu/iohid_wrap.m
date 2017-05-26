@@ -107,7 +107,7 @@ IOReturn IOHIDDeviceGetReport( IOHIDDeviceRef device, IOHIDReportType reportType
 IOReturn IOHIDDeviceSetReport( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, const uint8_t *report, CFIndex reportLength) {
 	printf("IOHIDDeviceSetReport\n");
     NSLog(@"IOHIDDeviceSetReport type: %u", reportType);
-
+    
 	return kIOReturnSuccess;
 }
 
@@ -137,8 +137,11 @@ IOReturn IOHIDDeviceSetReport( IOHIDDeviceRef device, IOHIDReportType reportType
 	NSPoint lastMouse;
 	CFAbsoluteTime lastMouseTime;
 	float mouseAccelX, mouseAccelY, mouseVelX, mouseVelY;
+    
     CVDisplayLinkRef displayLink;
+    bool displayLinkStarted;
 }
+
 @end
 
 static HIDRunner *hid;
@@ -166,6 +169,28 @@ static HIDRunner *hid;
 	});
 }
 
+-(void) startCVDisplayLink
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        displayLinkStarted = true;
+        CVReturn            error = kCVReturnSuccess;
+        CGDirectDisplayID   displayID = CGMainDisplayID();// 1
+        
+        error = CVDisplayLinkCreateWithCGDisplay(displayID, &displayLink);// 2
+        if(error)
+        {
+            NSLog(@"DisplayLink created with error:%d", error);
+            displayLink = NULL;
+            return;
+        }
+        
+        error = CVDisplayLinkSetOutputCallback(displayLink,// 3
+                                               MyDisplayLinkCallback, (void *)CFBridgingRetain(self));
+        CVDisplayLinkStart(displayLink);
+    });
+}
+
 CVReturn MyDisplayLinkCallback (
                                 CVDisplayLinkRef displayLink,
                                 const CVTimeStamp *inNow,
@@ -174,6 +199,7 @@ CVReturn MyDisplayLinkCallback (
                                 CVOptionFlags *flagsOut,
                                 void *displayLinkContext)
 {
+    //NSLog(@"my display link callback!");
     [hid kick];
     
     return kCVReturnSuccess;
@@ -187,20 +213,8 @@ CVReturn MyDisplayLinkCallback (
 
 	for(int i = 0; i < 256; ++i)
 		keys[i] = false;
-
-    CVReturn            error = kCVReturnSuccess;
-    CGDirectDisplayID   displayID = CGMainDisplayID();// 1
     
-    error = CVDisplayLinkCreateWithCGDisplay(displayID, &displayLink);// 2
-    if(error)
-    {
-        NSLog(@"DisplayLink created with error:%d", error);
-        displayLink = NULL;
-        return self;
-    }
-    
-    error = CVDisplayLinkSetOutputCallback(displayLink,// 3
-                                           MyDisplayLinkCallback, nil);
+    displayLinkStarted = false;
     
 	return self;
 }
@@ -217,7 +231,9 @@ CVReturn MyDisplayLinkCallback (
 
 	memcpy(report, brep, sizeof(brep));
 
+    [self mouseFunctionality];
 	[self mapKeys];
+    
 
 	uint8_t dpad = 8;
 	if(dpadLeft) {
@@ -252,7 +268,7 @@ CVReturn MyDisplayLinkCallback (
 
 	callback(context, kIOReturnSuccess, (void *)0xDEADBEEF, kIOHIDReportTypeInput, 0x01, report, 64);
 
-	NSLog(@"Tick");
+	//NSLog(@"Tick");
 	ticks++;
 }
 
@@ -267,7 +283,7 @@ CVReturn MyDisplayLinkCallback (
 		});
 }
 
-
+/*
 - (void)decayKick {
 	if(decayKicked)
 		return;
@@ -277,7 +293,7 @@ CVReturn MyDisplayLinkCallback (
 		decayKicked = false;
 		[self tick];
 	});
-}
+}*/
 
 #define JOYDECAY 5
 #define DEADZONE .1
@@ -287,18 +303,59 @@ CVReturn MyDisplayLinkCallback (
 #include "../mapKeys.h"
 }
 
+- (void) mouseFunctionality
+{
+    hid->mouseMoved = true;
+    
+    CFAbsoluteTime curtime = CFAbsoluteTimeGetCurrent();
+    NSPoint mouse = [NSEvent mouseLocation];
+    
+    CGEventRef ourEvent = CGEventCreate(NULL);
+    NSPoint point = CGEventGetLocation(ourEvent);
+    CFRelease(ourEvent);
+    //NSLog(@"Location? x= %f, y = %f", (float)point.x, (float)point.y);
+    
+    float velX = (point.x - hid->lastMouse.x); //hid->lastMouse.x); // / (curtime - hid->lastMouseTime);
+    float velY = (point.y - hid->lastMouse.y); //hid->lastMouse.y); // / (curtime - hid->lastMouseTime);
+    
+    NSLog(@"Movement:\nX: %0.30f\nY: %0.30f", velX, velY);
+    
+    float sensitivity = 0.25;
+    
+    hid->mouseAccelX = -velX; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
+    hid->mouseAccelY = velY; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
+    hid->mouseAccelX *= sensitivity;
+    hid->mouseAccelY *= sensitivity;
+    
+    hid->lastMouseTime = curtime;
+    hid->lastMouse = point;
+    
+    if((ticks % 10) == 0)
+    {
+        CGWarpMouseCursorPosition(CGPointMake(720,450));
+        hid->lastMouse.x = 720;
+        hid->lastMouse.y = 450;
+    }
+}
+
 - (void)keyDown:(NSEvent *)event {
 	//NSLog(@"down %i", [event keyCode]);
 	hid->keys[[event keyCode]] = true;
-	[hid kick];
+    
+    if(!displayLinkStarted)
+    {
+        [hid startCVDisplayLink];
+    }
+    
+	//[hid kick];
 }
 - (void)keyUp:(NSEvent *)event {
 	//NSLog(@"up %i", [event keyCode]);
 	hid->keys[[event keyCode]] = false;
-	[hid kick];
+	//[hid kick];
 }
 
-
+/*
 - (void)mouseMoved:(NSEvent *)event {
 	NSLog(@"mouseMoved");
 	NSPoint mouse = [NSEvent mouseLocation];
@@ -338,25 +395,25 @@ CVReturn MyDisplayLinkCallback (
 		hid->lastMouse = [NSEvent mouseLocation];
 	}
 
-	[hid kick];
-	[hid decayKick];
-}
+	//[hid kick];
+	//[hid decayKick];
+}*/
 
 - (void)mouseDown:(NSEvent *)event {
 	hid->leftMouse = true;
-	[hid kick];
+	//[hid kick];
 }
 - (void)mouseUp:(NSEvent *)event {
 	hid->leftMouse = false;
-	[hid kick];
+	//[hid kick];
 }
 - (void)rightMouseDown:(NSEvent *)event {
 	hid->rightMouse = true;
-	[hid kick];
+	//[hid kick];
 }
 - (void)rightMouseUp:(NSEvent *)event {
 	hid->rightMouse = false;
-	[hid kick];
+	//[hid kick];
 }
 @end
 
