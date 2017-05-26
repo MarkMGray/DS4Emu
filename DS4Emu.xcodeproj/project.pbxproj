@@ -20,7 +20,6 @@
 		A5B3C4191ED8882700746C74 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		A5B3C41A1ED8882700746C74 /* destiny.se */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destiny.se; sourceTree = "<group>"; };
 		A5B3C41B1ED8882700746C74 /* iohid_wrap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iohid_wrap.m; sourceTree = "<group>"; };
-		A5B3C41D1ED8882700746C74 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		A5B3C41E1ED8882700746C74 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
 		A5B3C41F1ED8882700746C74 /* shockemu.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = shockemu.py; sourceTree = "<group>"; };
 		A5B3C4241ED8884000746C74 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -71,7 +70,6 @@
 				A5B3C4191ED8882700746C74 /* build.sh */,
 				A5B3C41A1ED8882700746C74 /* destiny.se */,
 				A5B3C41B1ED8882700746C74 /* iohid_wrap.m */,
-				A5B3C41D1ED8882700746C74 /* Readme.md */,
 				A5B3C41E1ED8882700746C74 /* run.sh */,
 				A5B3C41F1ED8882700746C74 /* shockemu.py */,
 			);
@@ -314,6 +312,7 @@
 				A5B3C4181ED887ED00746C74 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
