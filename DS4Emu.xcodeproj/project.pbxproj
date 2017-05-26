@@ -1,0 +1,321 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A5B3C4201ED8882700746C74 /* iohid_wrap.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3C41B1ED8882700746C74 /* iohid_wrap.m */; };
+		A5B3C4251ED8884000746C74 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C4241ED8884000746C74 /* AppKit.framework */; };
+		A5B3C4271ED8884800746C74 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C4261ED8884800746C74 /* IOKit.framework */; };
+		A5B3C42B1ED8886500746C74 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C42A1ED8886500746C74 /* CoreFoundation.framework */; };
+		A5B3C42D1ED8886C00746C74 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C42C1ED8886C00746C74 /* Foundation.framework */; };
+		A5B3C4311ED8895600746C74 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C4301ED8895600746C74 /* CoreVideo.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A5B3C40D1ED887ED00746C74 /* libDS4Emu.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libDS4Emu.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5B3C4191ED8882700746C74 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		A5B3C41A1ED8882700746C74 /* destiny.se */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destiny.se; sourceTree = "<group>"; };
+		A5B3C41B1ED8882700746C74 /* iohid_wrap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iohid_wrap.m; sourceTree = "<group>"; };
+		A5B3C41D1ED8882700746C74 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		A5B3C41E1ED8882700746C74 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
+		A5B3C41F1ED8882700746C74 /* shockemu.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = shockemu.py; sourceTree = "<group>"; };
+		A5B3C4241ED8884000746C74 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		A5B3C4261ED8884800746C74 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A5B3C4281ED8885B00746C74 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		A5B3C42A1ED8886500746C74 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		A5B3C42C1ED8886C00746C74 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A5B3C42E1ED888E100746C74 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		A5B3C4301ED8895600746C74 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A5B3C40A1ED887ED00746C74 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A5B3C4311ED8895600746C74 /* CoreVideo.framework in Frameworks */,
+				A5B3C42D1ED8886C00746C74 /* Foundation.framework in Frameworks */,
+				A5B3C42B1ED8886500746C74 /* CoreFoundation.framework in Frameworks */,
+				A5B3C4271ED8884800746C74 /* IOKit.framework in Frameworks */,
+				A5B3C4251ED8884000746C74 /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A5B3C4041ED887ED00746C74 = {
+			isa = PBXGroup;
+			children = (
+				A5B3C40F1ED887ED00746C74 /* DS4Emu */,
+				A5B3C40E1ED887ED00746C74 /* Products */,
+				A5B3C4231ED8884000746C74 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		A5B3C40E1ED887ED00746C74 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A5B3C40D1ED887ED00746C74 /* libDS4Emu.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A5B3C40F1ED887ED00746C74 /* DS4Emu */ = {
+			isa = PBXGroup;
+			children = (
+				A5B3C4191ED8882700746C74 /* build.sh */,
+				A5B3C41A1ED8882700746C74 /* destiny.se */,
+				A5B3C41B1ED8882700746C74 /* iohid_wrap.m */,
+				A5B3C41D1ED8882700746C74 /* Readme.md */,
+				A5B3C41E1ED8882700746C74 /* run.sh */,
+				A5B3C41F1ED8882700746C74 /* shockemu.py */,
+			);
+			path = DS4Emu;
+			sourceTree = "<group>";
+		};
+		A5B3C4231ED8884000746C74 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A5B3C4301ED8895600746C74 /* CoreVideo.framework */,
+				A5B3C42E1ED888E100746C74 /* Quartz.framework */,
+				A5B3C42C1ED8886C00746C74 /* Foundation.framework */,
+				A5B3C42A1ED8886500746C74 /* CoreFoundation.framework */,
+				A5B3C4281ED8885B00746C74 /* QuartzCore.framework */,
+				A5B3C4261ED8884800746C74 /* IOKit.framework */,
+				A5B3C4241ED8884000746C74 /* AppKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		A5B3C40B1ED887ED00746C74 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		A5B3C40C1ED887ED00746C74 /* DS4Emu */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A5B3C4161ED887ED00746C74 /* Build configuration list for PBXNativeTarget "DS4Emu" */;
+			buildPhases = (
+				A5B3C4321ED88AFC00746C74 /* ShellScript */,
+				A5B3C4091ED887ED00746C74 /* Sources */,
+				A5B3C40A1ED887ED00746C74 /* Frameworks */,
+				A5B3C40B1ED887ED00746C74 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DS4Emu;
+			productName = DS4Emu;
+			productReference = A5B3C40D1ED887ED00746C74 /* libDS4Emu.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A5B3C4051ED887ED00746C74 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Gray Gaming";
+				TargetAttributes = {
+					A5B3C40C1ED887ED00746C74 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = U8PXN33KE5;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = A5B3C4081ED887ED00746C74 /* Build configuration list for PBXProject "DS4Emu" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A5B3C4041ED887ED00746C74;
+			productRefGroup = A5B3C40E1ED887ED00746C74 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A5B3C40C1ED887ED00746C74 /* DS4Emu */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A5B3C4321ED88AFC00746C74 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/Users/mathewgray/Documents/DS4Emu/DS4Emu/build.sh DS4Emu/destiny.se";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A5B3C4091ED887ED00746C74 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A5B3C4201ED8882700746C74 /* iohid_wrap.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A5B3C4141ED887ED00746C74 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A5B3C4151ED887ED00746C74 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		A5B3C4171ED887ED00746C74 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = U8PXN33KE5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A5B3C4181ED887ED00746C74 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = U8PXN33KE5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A5B3C4081ED887ED00746C74 /* Build configuration list for PBXProject "DS4Emu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5B3C4141ED887ED00746C74 /* Debug */,
+				A5B3C4151ED887ED00746C74 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A5B3C4161ED887ED00746C74 /* Build configuration list for PBXNativeTarget "DS4Emu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5B3C4171ED887ED00746C74 /* Debug */,
+				A5B3C4181ED887ED00746C74 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A5B3C4051ED887ED00746C74 /* Project object */;
+}
