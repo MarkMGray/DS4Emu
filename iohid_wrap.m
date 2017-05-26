@@ -163,6 +163,7 @@ static HIDRunner *hid;
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseUp:));
 	});
 }
+
 - (id)initWithRunLoop:(CFRunLoopRef)_runLoop andMode:(CFStringRef)_mode {
 	hid = self = [super init];
 	runLoop = _runLoop;
@@ -215,16 +216,14 @@ static HIDRunner *hid;
 	prep->buttons3 = ((ticks << 2) & 0xFF) | (touchpad ? 2 : 0) | (PS ? 1 : 0);
 	prep->left_trigger = L2 ? 255 : 0;
 	prep->right_trigger = R2 ? 255 : 0;
-	prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 127, 0), 255);
-	prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 127, 0), 255);
-	prep->right_x = (uint8_t) fmin(fmax(128 + rightX * 127, 0), 255);
-	prep->right_y = (uint8_t) fmin(fmax(128 + rightY * 127, 0), 255);
-
-	hid->mouseAccelX = 0;
-	hid->mouseAccelY = 0;
+	prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 128, 0), 255);
+	prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 128, 0), 255);
+	prep->right_x = (uint8_t) fmin(fmax(128 + rightX * 128, 0), 255);
+	prep->right_y = (uint8_t) fmin(fmax(128 + rightY * 128, 0), 255);
 
 	callback(context, kIOReturnSuccess, (void *)0xDEADBEEF, kIOHIDReportTypeInput, 0x01, report, 64);
 
+	NSLog(@"Tick");
 	ticks++;
 }
 
@@ -233,11 +232,12 @@ static HIDRunner *hid;
 	if(kicked)
 		return;
 	kicked = true;
-	CFRunLoopPerformBlock(runLoop, runLoopMode, ^void() {
-		kicked = false;
-		[self tick];
-	});
+		CFRunLoopPerformBlock(runLoop, runLoopMode, ^void() {
+			kicked = false;
+			[self tick];
+		});
 }
+
 
 - (void)decayKick {
 	if(decayKicked)
@@ -269,31 +269,50 @@ static HIDRunner *hid;
 	[hid kick];
 }
 
+
 - (void)mouseMoved:(NSEvent *)event {
 	NSLog(@"mouseMoved");
+	NSPoint mouse = [NSEvent mouseLocation];
 
-	NSPoint mouse = [event locationInWindow];
-	CFAbsoluteTime curtime = CFAbsoluteTimeGetCurrent();
-	float velX = (mouse.x - hid->lastMouse.x) / (curtime - hid->lastMouseTime);
-	float velY = (mouse.y - hid->lastMouse.y) / (curtime - hid->lastMouseTime);
+	if(hid->mouseMoved && (mouse.x != 720 || mouse.y != 450))
+		return;
 
-	float sensitivity = 100;
-
-	hid->mouseAccelX = (hid->lastMouse.x - mouse.x) * sensitivity; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
-	hid->mouseAccelY = (hid->lastMouse.y - mouse.y) * sensitivity; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
-
-	NSLog(@"vel %f %f", velX, velY);
-	NSLog(@"accel %f %f", hid->mouseAccelX, hid->mouseAccelY);
-	hid->mouseVelX = velX;
-	hid->mouseVelY = velY;
-	hid->lastMouseTime = curtime;
-
-	hid->lastMouse = mouse;
 	hid->mouseMoved = true;
+
+	//NSPoint mouse = [event locationInWindow];
+
+
+	CFAbsoluteTime curtime = CFAbsoluteTimeGetCurrent();
+	float velX = (mouse.x - hid->lastMouse.x); // / (curtime - hid->lastMouseTime);
+	float velY = (mouse.y - hid->lastMouse.y); // / (curtime - hid->lastMouseTime);
+
+	float sensitivity = 5;
+
+	float xPos = mouse.x;
+	float yPos = mouse.y;
+
+	hid->mouseAccelX = -velX; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
+	hid->mouseAccelY = -velY; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
+	hid->mouseAccelX *= sensitivity;
+	hid->mouseAccelY *= sensitivity;
+
+	//NSLog(@"MouseX: %0.2f, MouseY: %02.f", xPos, yPos);
+
+	NSLog(@"accel %f %f", hid->mouseAccelX, hid->mouseAccelY);
+	hid->lastMouseTime = curtime;
+	hid->lastMouse = mouse;
+
+
+	if(fabs(720 - mouse.x) > 600 || fabs(450 - mouse.y) > 400)
+	{
+		CGWarpMouseCursorPosition(CGPointMake(720,450));
+		hid->lastMouse = [NSEvent mouseLocation];
+	}
 
 	[hid kick];
 	[hid decayKick];
 }
+
 - (void)mouseDown:(NSEvent *)event {
 	hid->leftMouse = true;
 	[hid kick];

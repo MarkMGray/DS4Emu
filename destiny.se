@@ -9,9 +9,9 @@ r = square
 q = triangle
 
 leftMouse = R2
-rightMouse = L1
+rightMouse = L2
 
-g = L2
+g = L1
 shift = L3
 control = R3
 v = R1
@@ -31,5 +31,5 @@ tab = options
 mouseLook.type = linear # 1:1 translation mode, no curve
 mouseLook.stick = right
 mouseLook.multY = 1 # Flips the Y axis for mouseLook
-mouseLook.deadZone = 0.05 # Sets the dead zone for the joystick
-mouseLook.decay = 5 # What the joystick movement is divided by at each tick (probably does very little)
+mouseLook.deadZone = 0.1 # Sets the dead zone for the joystick
+mouseLook.decay = 10 # What the joystick movement is divided by at each tick (probably does very little)

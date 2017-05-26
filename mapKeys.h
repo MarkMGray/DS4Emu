@@ -2,14 +2,14 @@ R3 = DOWN(59);
 dpadRight = DOWN(124);
 dpadDown = DOWN(125);
 options = DOWN(48);
-L1 = rightMouse;
+L2 = rightMouse;
 X = DOWN(49);
 R2 = leftMouse;
 leftX = leftY = 0;
 if(DOWN(0)) leftX -= 1;
 O = DOWN(8);
 if(DOWN(2)) leftX += 1;
-L2 = DOWN(5);
+L1 = DOWN(5);
 L3 = DOWN(56);
 dpadUp = DOWN(126);
 triangle = DOWN(12);
@@ -25,13 +25,12 @@ if(mouseMoved) {
 	rightY = mouseAccelY;
 	mouseMoved = false;
 } else {
-	CGWarpMouseCursorPosition(CGPointMake(720, 450));
-	hid->lastMouse = [NSEvent mouseLocation];
-	rightX = 0; //5;
-	rightY = 0; //5;
-	if(fabs(rightX) > 0.05 || fabs(rightY) > 0.05) {
+	rightX /= 10;
+	rightY /= 10;
+	if(fabs(rightX) > 0.1 || fabs(rightY) > 0.1) {
 		NSLog(@"Still decaying... %f %f", rightX, rightY);
 		[self decayKick];
-	} else
+	} else {
 		rightX = rightY = 0;
+	}
 }

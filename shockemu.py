@@ -65,15 +65,14 @@ with file('mapKeys.h', 'w') as fp:
 	{stick}Y = mouseAccelY;
 	mouseMoved = false;
 }} else {{
-	CGWarpMouseCursorPosition(CGPointMake(720, 450));
-	hid->lastMouse = [NSEvent mouseLocation];
-	{stick}X = 0; //{decay};
-	{stick}Y = 0; //{decay};
+	{stick}X /= {decay};
+	{stick}Y /= {decay};
 	if(fabs({stick}X) > {deadZone} || fabs({stick}Y) > {deadZone}) {{
 		NSLog(@"Still decaying... %f %f", {stick}X, {stick}Y);
 		[self decayKick];
-	}} else
+	}} else {{
 		{stick}X = {stick}Y = 0;
+	}}
 }}'''.format(**mouseLook)
 		else:
 			print 'Unknown mouseLook type:', mouseLook
