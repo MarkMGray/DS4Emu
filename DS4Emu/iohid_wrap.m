@@ -6,10 +6,15 @@
 #include <IOKit/hid/IOHIDLib.h>
 #import <objc/runtime.h>
 #import <CoreVideo/CVDisplayLink.h>
+#import <OpenGL/gl.h>
+#import <OpenGL/OpenGL.h>
 
 #include <stdio.h>
 #include <unistd.h>
 #include <dlfcn.h>
+
+#import "FastSocket.h"
+#import "FastServerSocket.h"
 
 typedef struct {
 	uint8_t id,
@@ -140,6 +145,13 @@ IOReturn IOHIDDeviceSetReport( IOHIDDeviceRef device, IOHIDReportType reportType
     
     CVDisplayLinkRef displayLink;
     bool displayLinkStarted;
+    
+    bool warpedMouse;
+    NSWindow * window;
+    NSOpenGLView * view;
+    
+    FastServerSocket * fss;
+    FastSocket * connectedApp;
 }
 
 @end
@@ -216,14 +228,30 @@ CVReturn MyDisplayLinkCallback (
     
     displayLinkStarted = false;
     
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
+        fss = [[FastServerSocket alloc] initWithPort:@"5555"];
+        bool canListen = [fss listen];
+        
+        if(!canListen)
+        {
+            NSLog(@"Error trying to listen!");
+        }
+        
+        connectedApp = [fss accept];
+        
+        NSLog(@"Connected an app!");
+    });
+    
 	return self;
 }
+
 - (void)registerCallback:(IOHIDReportCallback)cb withContext:(void *)ctx andReport:(uint8_t *)rep withLength:(CFIndex) repLen {
 	callback = cb;
 	context = ctx;
 	report = rep;
 	reportLength = repLen;
 }
+
 - (void)tick {
 	uint8_t brep[] = {0x01, 0x7f, 0x81, 0x82, 0x7d, 0x08, 0x00, 0xb4, 0x00, 0x00, 0xc8, 0xad, 0xf9, 0x04, 0x00, 0xfe, 0xff, 0xfc, 0xff, 0xe5, 0xfe, 0xcb, 0x1f, 0x69, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b, 0x00, 0x00, 0x01, 0x63, 0x8b, 0x80, 0xc1, 0x2e, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00};
 
@@ -278,8 +306,8 @@ CVReturn MyDisplayLinkCallback (
 		return;
 	kicked = true;
 		CFRunLoopPerformBlock(runLoop, runLoopMode, ^void() {
-			kicked = false;
 			[self tick];
+            kicked = false;
 		});
 }
 
@@ -318,9 +346,24 @@ CVReturn MyDisplayLinkCallback (
     float velX = (point.x - hid->lastMouse.x); //hid->lastMouse.x); // / (curtime - hid->lastMouseTime);
     float velY = (point.y - hid->lastMouse.y); //hid->lastMouse.y); // / (curtime - hid->lastMouseTime);
     
+    //lets try merging the old velocity with the new
+    velX = (velX * 0.65) + (hid->mouseVelX * 0.35);
+    velY = (velY * 0.65) + (hid->mouseVelY * 0.35);
+    
+    float sensitivity = 1/10.0f;
+    
+    //if we warped the mouse last frame, ignore the new movement and use the old for this frame only
+    if(warpedMouse)
+    {
+        warpedMouse = false;
+        velX = hid->mouseVelX;
+        velY = hid->mouseVelY;
+    }
+    
     NSLog(@"Movement:\nX: %0.30f\nY: %0.30f", velX, velY);
     
-    float sensitivity = 0.25;
+    hid->mouseVelX = velX;
+    hid->mouseVelY = velY;
     
     hid->mouseAccelX = -velX; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
     hid->mouseAccelY = velY; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
@@ -330,22 +373,25 @@ CVReturn MyDisplayLinkCallback (
     hid->lastMouseTime = curtime;
     hid->lastMouse = point;
     
+    /*
     if((ticks % 10) == 0)
     {
         CGWarpMouseCursorPosition(CGPointMake(720,450));
         hid->lastMouse.x = 720;
         hid->lastMouse.y = 450;
-    }
+        hid->warpedMouse = true;
+    }*/
 }
 
 - (void)keyDown:(NSEvent *)event {
 	//NSLog(@"down %i", [event keyCode]);
 	hid->keys[[event keyCode]] = true;
     
+    /*
     if(!displayLinkStarted)
     {
         [hid startCVDisplayLink];
-    }
+    }*/
     
 	//[hid kick];
 }
