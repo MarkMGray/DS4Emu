@@ -240,6 +240,20 @@ CVReturn MyDisplayLinkCallback (
         connectedApp = [fss accept];
         
         NSLog(@"Connected an app!");
+        NSLog(@"Connected an app1!");
+        
+        uint8_t buffer[64];
+        
+        while(1){
+            long received = [connectedApp receiveBytes:buffer count:64];
+            //NSLog(@"Received bytes: %lu", received);
+            
+            if(received == 0)
+                break;
+            
+            report = buffer;
+            callback(context, kIOReturnSuccess, (void *)0xDEADBEEF, kIOHIDReportTypeInput, 0x01, report, 64);
+        }
     });
     
 	return self;
