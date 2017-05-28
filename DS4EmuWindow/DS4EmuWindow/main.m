@@ -101,9 +101,9 @@ void parseKeys(GLFWwindow * window, PSReport * prep)
         leftX -= 1;
     if(isKeyDown(window, GLFW_KEY_D))
         leftX += 1;
-    if(isKeyDown(window, GLFW_KEY_W))
-        leftY += 1;
     if(isKeyDown(window, GLFW_KEY_S))
+        leftY += 1;
+    if(isKeyDown(window, GLFW_KEY_W))
         leftY -= 1;
     
     prep->buttons1 = (triangle ? (1 << 7) : 0) | (O ? (1 << 6) : 0) | (X ? (1 << 5) : 0) | (square ? (1 << 4) : 0) | dpad;
@@ -114,9 +114,6 @@ void parseKeys(GLFWwindow * window, PSReport * prep)
     prep->right_trigger = R2 ? 255 : 0;
     prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 128, 0), 255);
     prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 128, 0), 255);
-    //prep->right_x = (uint8_t) fmin(fmax(128 + rightX * 128, 0), 255);
-    //prep->right_y = (uint8_t) fmin(fmax(128 + rightY * 128, 0), 255);
-    
 }
 
 void processMouse(GLFWwindow * window, PSReport * prep)
@@ -128,11 +125,31 @@ void processMouse(GLFWwindow * window, PSReport * prep)
     double diffy = ypos - lastMouseY;
     
     //we need to scale these values from -1 to 1
-    diffx /= 5;
-    diffy /= 5;
+    diffx /= 15;
+    diffy /= 15;
     
-    prep->right_x = (uint8_t) fmin(fmax(128 + diffx * 128, 0), 255);
-    prep->right_y = (uint8_t) fmin(fmax(128 + diffy * 128, 0), 255);
+    
+    if(diffx < 0)
+        diffx = fmax(90 + diffx * 90, 0);
+    else if(diffx > 0)
+        diffx = fmin(163 + diffx * 92, 255);
+    else
+        diffx = 128;
+    
+    if(diffy < 0)
+        diffy = fmax(90 + diffy * 90, 0);
+    else if(diffy > 0)
+        diffy = fmin(163 + diffy * 92, 255);
+    else
+        diffy = 128;
+    
+    prep->right_x = (uint8_t) diffx;
+    prep->right_y = (uint8_t) diffy;
+    
+    NSLog(@"Prep X: %d Y: %d", prep->right_x, prep->right_y);
+    
+    lastMouseX = xpos;
+    lastMouseY = ypos;
 }
 
 void error_callback(int error, const char* description)

@@ -12,10 +12,10 @@
 		A58E76D71ED8F0B000AC7F06 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76D51ED8F0B000AC7F06 /* OpenGL.framework */; };
 		A58E76E51ED92EAE00AC7F06 /* FastServerSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A58E76E21ED92EAE00AC7F06 /* FastServerSocket.m */; };
 		A58E76E61ED92EAE00AC7F06 /* FastSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A58E76E41ED92EAE00AC7F06 /* FastSocket.m */; };
-		A58E76EB1ED9D56A00AC7F06 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76E71ED9CEE800AC7F06 /* libglfw3.a */; };
 		A58E76ED1ED9D56F00AC7F06 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76EC1ED9D56F00AC7F06 /* CoreVideo.framework */; };
 		A58E76EF1ED9D57900AC7F06 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76EE1ED9D57900AC7F06 /* Cocoa.framework */; };
 		A58E76F11ED9D58800AC7F06 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76F01ED9D58800AC7F06 /* IOKit.framework */; };
+		A58E76F31EDA5B3D00AC7F06 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76F21EDA5B3C00AC7F06 /* libglfw3.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,10 +39,10 @@
 		A58E76E21ED92EAE00AC7F06 /* FastServerSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FastServerSocket.m; path = ../FastServerSocket.m; sourceTree = "<group>"; };
 		A58E76E31ED92EAE00AC7F06 /* FastSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FastSocket.h; path = ../FastSocket.h; sourceTree = "<group>"; };
 		A58E76E41ED92EAE00AC7F06 /* FastSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FastSocket.m; path = ../FastSocket.m; sourceTree = "<group>"; };
-		A58E76E71ED9CEE800AC7F06 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = DS4EmuWindow/libglfw3.a; sourceTree = "<group>"; };
 		A58E76EC1ED9D56F00AC7F06 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		A58E76EE1ED9D57900AC7F06 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A58E76F01ED9D58800AC7F06 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A58E76F21EDA5B3C00AC7F06 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = DS4EmuWindow/libglfw3.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,10 +50,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A58E76F31EDA5B3D00AC7F06 /* libglfw3.a in Frameworks */,
 				A58E76F11ED9D58800AC7F06 /* IOKit.framework in Frameworks */,
 				A58E76EF1ED9D57900AC7F06 /* Cocoa.framework in Frameworks */,
 				A58E76ED1ED9D56F00AC7F06 /* CoreVideo.framework in Frameworks */,
-				A58E76EB1ED9D56A00AC7F06 /* libglfw3.a in Frameworks */,
 				A58E76D61ED8F0B000AC7F06 /* GLUT.framework in Frameworks */,
 				A58E76D71ED8F0B000AC7F06 /* OpenGL.framework in Frameworks */,
 			);
@@ -91,10 +91,10 @@
 		A58E76D31ED8F0B000AC7F06 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A58E76F21EDA5B3C00AC7F06 /* libglfw3.a */,
 				A58E76F01ED9D58800AC7F06 /* IOKit.framework */,
 				A58E76EE1ED9D57900AC7F06 /* Cocoa.framework */,
 				A58E76EC1ED9D56F00AC7F06 /* CoreVideo.framework */,
-				A58E76E71ED9CEE800AC7F06 /* libglfw3.a */,
 				A58E76D41ED8F0B000AC7F06 /* GLUT.framework */,
 				A58E76D51ED8F0B000AC7F06 /* OpenGL.framework */,
 			);
@@ -319,6 +319,7 @@
 				A58E76D21ED8F09C00AC7F06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
