@@ -268,7 +268,7 @@ static send_type originalParse = NULL;
     prep->right_y = (uint8_t) mouseY;
     
     
-    //diffx = diffy = 0;
+    diffx = diffy = 0;
     
     dispatch_semaphore_signal(mouseSemaphore);
     
