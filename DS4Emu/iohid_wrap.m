@@ -158,6 +158,9 @@ IOReturn IOHIDDeviceSetReport( IOHIDDeviceRef device, IOHIDReportType reportType
 
 static HIDRunner *hid;
 
+typedef void (*send_type)(id, SEL, CFIndex, uint8_t *, CFIndex);
+static send_type originalParse = NULL;
+
 #define SWAP(ocls, sel) do { \
 	id rcls = NSClassFromString(@"_TtC10RemotePlay17RPWindowStreaming"); \
 	SEL selector = @selector sel; \
@@ -167,6 +170,7 @@ static HIDRunner *hid;
 } while(0)
 
 @implementation HIDRunner
+
 + (void)load {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -178,7 +182,20 @@ static HIDRunner *hid;
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (mouseUp:));
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseDown:));
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseUp:));
+        
+        id mcls = NSClassFromString(@"DSDevice");
+        SEL mSelector = @selector(parseInputReportID:Report:Length:);
+        Method orig = class_getInstanceMethod(mcls, mSelector);
+        originalParse = (send_type) method_getImplementation(orig);
+        Method new = class_getInstanceMethod(cls, @selector(parseInputReportID:Report:Length:));
+        method_exchangeImplementations(orig, new);
 	});
+}
+
+-(void) parseInputReportID: (CFIndex) index Report: (uint8_t *) rep Length: (CFIndex) len
+{
+    NSLog(@"Input Report ID: %lu, Length: %lu", index, len);
+    originalParse(self, @selector(parseInputReportID:Report:Length:), index, rep, len);
 }
 
 -(void) startCVDisplayLink
@@ -228,6 +245,7 @@ CVReturn MyDisplayLinkCallback (
     
     displayLinkStarted = false;
     
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
         fss = [[FastServerSocket alloc] initWithPort:@"5555"];
         bool canListen = [fss listen];
@@ -255,6 +273,8 @@ CVReturn MyDisplayLinkCallback (
             callback(context, kIOReturnSuccess, (void *)0xDEADBEEF, kIOHIDReportTypeInput, 0x01, report, 64);
         }
     });
+    
+    
     
 	return self;
 }
@@ -374,7 +394,7 @@ CVReturn MyDisplayLinkCallback (
         velY = hid->mouseVelY;
     }
     
-    NSLog(@"Movement:\nX: %0.30f\nY: %0.30f", velX, velY);
+    //NSLog(@"Movement:\nX: %0.30f\nY: %0.30f", velX, velY);
     
     hid->mouseVelX = velX;
     hid->mouseVelY = velY;
@@ -400,64 +420,13 @@ CVReturn MyDisplayLinkCallback (
 - (void)keyDown:(NSEvent *)event {
 	//NSLog(@"down %i", [event keyCode]);
 	hid->keys[[event keyCode]] = true;
-    
-    /*
-    if(!displayLinkStarted)
-    {
-        [hid startCVDisplayLink];
-    }*/
-    
-	//[hid kick];
 }
 - (void)keyUp:(NSEvent *)event {
 	//NSLog(@"up %i", [event keyCode]);
 	hid->keys[[event keyCode]] = false;
-	//[hid kick];
+	[hid kick];
 }
 
-/*
-- (void)mouseMoved:(NSEvent *)event {
-	NSLog(@"mouseMoved");
-	NSPoint mouse = [NSEvent mouseLocation];
-
-	if(hid->mouseMoved && (mouse.x != 720 || mouse.y != 450))
-		return;
-
-	hid->mouseMoved = true;
-
-	//NSPoint mouse = [event locationInWindow];
-
-
-	CFAbsoluteTime curtime = CFAbsoluteTimeGetCurrent();
-	float velX = (mouse.x - hid->lastMouse.x); // / (curtime - hid->lastMouseTime);
-	float velY = (mouse.y - hid->lastMouse.y); // / (curtime - hid->lastMouseTime);
-
-	float sensitivity = 5;
-
-	float xPos = mouse.x;
-	float yPos = mouse.y;
-
-	hid->mouseAccelX = -velX; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
-	hid->mouseAccelY = -velY; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
-	hid->mouseAccelX *= sensitivity;
-	hid->mouseAccelY *= sensitivity;
-
-	//NSLog(@"MouseX: %0.2f, MouseY: %02.f", xPos, yPos);
-
-	NSLog(@"accel %f %f", hid->mouseAccelX, hid->mouseAccelY);
-	hid->lastMouseTime = curtime;
-	hid->lastMouse = mouse;
-
-
-	if(fabs(720 - mouse.x) > 600 || fabs(450 - mouse.y) > 400)
-	{
-		CGWarpMouseCursorPosition(CGPointMake(720,450));
-		hid->lastMouse = [NSEvent mouseLocation];
-	}
-
-	//[hid kick];
-	//[hid decayKick];
-}*/
 
 - (void)mouseDown:(NSEvent *)event {
 	hid->leftMouse = true;

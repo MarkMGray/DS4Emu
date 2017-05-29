@@ -16,6 +16,7 @@
 		A58E76EF1ED9D57900AC7F06 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76EE1ED9D57900AC7F06 /* Cocoa.framework */; };
 		A58E76F11ED9D58800AC7F06 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76F01ED9D58800AC7F06 /* IOKit.framework */; };
 		A58E76F31EDA5B3D00AC7F06 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A58E76F21EDA5B3C00AC7F06 /* libglfw3.a */; };
+		A5DF4D2A1EDC8BA300784E1E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DF4D291EDC8BA300784E1E /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +44,7 @@
 		A58E76EE1ED9D57900AC7F06 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A58E76F01ED9D58800AC7F06 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A58E76F21EDA5B3C00AC7F06 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = DS4EmuWindow/libglfw3.a; sourceTree = "<group>"; };
+		A5DF4D291EDC8BA300784E1E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5DF4D2A1EDC8BA300784E1E /* CoreFoundation.framework in Frameworks */,
 				A58E76F31EDA5B3D00AC7F06 /* libglfw3.a in Frameworks */,
 				A58E76F11ED9D58800AC7F06 /* IOKit.framework in Frameworks */,
 				A58E76EF1ED9D57900AC7F06 /* Cocoa.framework in Frameworks */,
@@ -91,6 +94,7 @@
 		A58E76D31ED8F0B000AC7F06 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A5DF4D291EDC8BA300784E1E /* CoreFoundation.framework */,
 				A58E76F21EDA5B3C00AC7F06 /* libglfw3.a */,
 				A58E76F01ED9D58800AC7F06 /* IOKit.framework */,
 				A58E76EE1ED9D57900AC7F06 /* Cocoa.framework */,

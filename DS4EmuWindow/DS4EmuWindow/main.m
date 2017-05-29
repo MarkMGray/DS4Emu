@@ -10,6 +10,7 @@
 #import <OpenGL/gl.h>
 #import "FastSocket.h"
 #import <GLFW/glfw3.h>
+#include <IOKit/hid/IOHIDKeys.h>
 
 double lastMouseX, lastMouseY;
 
@@ -25,6 +26,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }*/
+
 
 typedef struct {
     uint8_t id,
@@ -124,6 +126,8 @@ void processMouse(GLFWwindow * window, PSReport * prep)
     double diffx = xpos - lastMouseX;
     double diffy = ypos - lastMouseY;
     
+    NSLog(@"Prep X: %0.0f Y: %0.0f", diffx, diffy);
+    
     //we need to scale these values from -1 to 1
     diffx /= 15;
     diffy /= 15;
@@ -146,7 +150,7 @@ void processMouse(GLFWwindow * window, PSReport * prep)
     prep->right_x = (uint8_t) diffx;
     prep->right_y = (uint8_t) diffy;
     
-    NSLog(@"Prep X: %d Y: %d", prep->right_x, prep->right_y);
+    
     
     lastMouseX = xpos;
     lastMouseY = ypos;
@@ -221,17 +225,116 @@ int main(int argc, const char * argv[]) {
     glfwTerminate();
     free(report);
     
-    /*glutInitDisplayMode(GLUT_RGB);
-    glutInitWindowSize(300,300);
-    glutCreateWindow("FPS Mouse Sample");
-    glutDisplayFunc(&display);
-    glutPassiveMotionFunc(&passivemotion);
-    glutMotionFunc(&passivemotion);
-    glutSetCursor( GLUT_CURSOR_NONE );
-    glutTimerFunc(16,timerfunc,0);
-    
-    glfw
-    glutMainLoop();*/
-    
     return 0;
 }
+
+/*
+// function to create matching dictionary
+static CFMutableDictionaryRef hu_CreateDeviceMatchingDictionary( UInt32 inUsagePage, UInt32 inUsage )
+{
+    // create a dictionary to add usage page/usages to
+    CFMutableDictionaryRef result = CFDictionaryCreateMutable(
+                                                              kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks );
+    if ( result ) {
+        if ( inUsagePage ) {
+            // Add key for device type to refine the matching dictionary.
+            CFNumberRef pageCFNumberRef = CFNumberCreate(
+                                                         kCFAllocatorDefault, kCFNumberIntType, &inUsagePage );
+            if ( pageCFNumberRef ) {
+                CFDictionarySetValue( result,
+                                     CFSTR( kIOHIDDeviceUsagePageKey ), pageCFNumberRef );
+                CFRelease( pageCFNumberRef );
+                
+                // note: the usage is only valid if the usage page is also defined
+                if ( inUsage ) {
+                    CFNumberRef usageCFNumberRef = CFNumberCreate(
+                                                                  kCFAllocatorDefault, kCFNumberIntType, &inUsage );
+                    if ( usageCFNumberRef ) {
+                        CFDictionarySetValue( result,
+                                             CFSTR( kIOHIDDeviceUsageKey ), usageCFNumberRef );
+                        CFRelease( usageCFNumberRef );
+                    } else {
+                        fprintf( stderr, "%s: CFNumberCreate( usage ) failed.", __PRETTY_FUNCTION__ );
+                    }
+                }
+            } else {
+                fprintf( stderr, "%s: CFNumberCreate( usage page ) failed.", __PRETTY_FUNCTION__ );
+            }
+        }
+    } else {
+        fprintf( stderr, "%s: CFDictionaryCreateMutable failed.", __PRETTY_FUNCTION__ );
+    }
+    return result;
+}   // hu_CreateDeviceMatchingDictionary
+
+char * MYCFStringCopyUTF8String(CFStringRef aString) {
+    if (aString == NULL) {
+        return NULL;
+    }
+    
+    CFIndex length = CFStringGetLength(aString);
+    CFIndex maxSize =
+    CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+    char *buffer = (char *)malloc(maxSize);
+    if (CFStringGetCString(aString, buffer, maxSize,
+                           kCFStringEncodingUTF8)) {
+        return buffer;
+    }
+    free(buffer); // If we failed
+    return NULL;
+}
+
+int reportCount = 0;
+
+static void Handle_IOHIDInputValueCallback(
+                                           void *          inContext,      // context from IOHIDManagerRegisterInputValueCallback
+                                           IOReturn        inResult,       // completion result for the input value operation
+                                           void *          inSender,       // the IOHIDManagerRef
+                                           IOHIDValueRef   inIOHIDValueRef // the new element value
+) {
+    IOHIDElementRef elementRef = IOHIDValueGetElement(inIOHIDValueRef);
+    uint32_t usage = IOHIDElementGetUsage(elementRef);
+    
+    CFIndex x = IOHIDValueGetIntegerValue(inIOHIDValueRef);
+    
+    if(usage == 48)
+        printf("%d - %u: %ld\n", reportCount++, usage, x);
+}
+
+int main(int argc, char * argv[])
+{
+    IOHIDManagerRef managerRef = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    // Create a matching dictionary
+    CFDictionaryRef matchingCFDictRef =
+    hu_CreateDeviceMatchingDictionary( kHIDPage_GenericDesktop, kHIDUsage_GD_Mouse );
+    
+    printf("hello world\n");
+    
+    if ( matchingCFDictRef ) {
+        // set the HID device matching dictionary
+        IOHIDManagerSetDeviceMatching( managerRef, matchingCFDictRef );
+    } else {
+        fprintf( stderr, "%s: hu_CreateDeviceMatchingDictionary failed.", __PRETTY_FUNCTION__ );
+        return -1;
+    }
+    
+    CFRunLoopRef runLoopRef = CFRunLoopGetCurrent();
+    IOHIDManagerScheduleWithRunLoop(managerRef, runLoopRef, kCFRunLoopDefaultMode);
+    
+    
+    IOReturn ret = IOHIDManagerOpen(managerRef, kIOHIDOptionsTypeNone);
+    
+    if(ret != kIOReturnSuccess)
+        fprintf( stderr, "%s: IOHIDManagerOpen failed.", __PRETTY_FUNCTION__ );
+    
+    //IOHIDManagerClose(managerRef, kIOHIDOptionsTypeNone);
+    
+    int context = 1;
+    IOHIDManagerRegisterInputValueCallback( managerRef, Handle_IOHIDInputValueCallback, &context );
+    printf("here");
+    CFRunLoopRun();
+    
+    //dispatch_semaphore_wait(mySemaphore, DISPATCH_TIME_FOREVER);
+    
+    return 0;
+}*/
