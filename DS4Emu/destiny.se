@@ -8,8 +8,8 @@ space = X
 r = square
 q = triangle
 
-leftMouse = R2
-rightMouse = L2
+#leftMouse = R2
+#rightMouse = L2
 
 g = L1
 shift = L3
