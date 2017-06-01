@@ -166,7 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Users/mathewgray/Documents/DS4Emu/DS4Emu/build.sh DS4Emu/destiny.se";
+			shellScript = "DS4Emu/build.sh DS4Emu/destiny.se";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -274,6 +274,7 @@
 		A5B3C4171ED887ED00746C74 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				DEVELOPMENT_TEAM = U8PXN33KE5;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

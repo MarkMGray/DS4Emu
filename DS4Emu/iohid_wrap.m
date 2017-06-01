@@ -5,146 +5,132 @@
 #include <IOKit/IOReturn.h>
 #include <IOKit/hid/IOHIDLib.h>
 #import <objc/runtime.h>
-#import <CoreVideo/CVDisplayLink.h>
 
 #include <stdio.h>
 #include <unistd.h>
 #include <dlfcn.h>
 
-typedef struct {
-	uint8_t id,
-	left_x, left_y,
-	right_x, right_y,
-	buttons1, buttons2, buttons3,
-	left_trigger, right_trigger,
-	unk1, unk2, unk3;
-	int16_t gyro_x, gyro_y, gyro_z;
-	int16_t accel_x, accel_y, accel_z;
-	uint8_t unk4[39];
-} PSReport;
-
-uint8_t * report14;
-
-IOHIDManagerRef IOHIDManagerCreate( CFAllocatorRef allocator, IOOptionBits options) {
-	printf("IOHIDManagerCreate\n");
-	return (IOHIDManagerRef) 0xDEADBEEF;
-}
-
-IOReturn IOHIDManagerOpen( IOHIDManagerRef manager, IOOptionBits options) {
-	printf("IOHIDManagerOpen\n");
-	return kIOReturnSuccess;
-}
-
-IOReturn IOHIDManagerClose( IOHIDManagerRef manager, IOOptionBits options) {
-	printf("IOHIDManagerClose\n");
-	return kIOReturnSuccess;
-}
-
-CFSetRef IOHIDManagerCopyDevices( IOHIDManagerRef manager) {
-	IOHIDDeviceRef dev = (IOHIDDeviceRef) 0xDEADBEEF;
-	IOHIDDeviceRef devs[1] = {dev};
-	printf("IOHIDManagerCopyDevices\n");
-	return CFSetCreate(NULL, (const void **) devs, 1, NULL);
-}
-
-void IOHIDManagerRegisterDeviceMatchingCallback( IOHIDManagerRef manager, IOHIDDeviceCallback callback, void *context) {
-	printf("IOHIDManagerRegisterDeviceMatchingCallback\n");
-}
-
-void IOHIDManagerRegisterDeviceRemovalCallback( IOHIDManagerRef manager, IOHIDDeviceCallback callback, void *context) {
-	printf("IOHIDManagerRegisterDeviceMatchingCallback\n");
-}
-
-void IOHIDManagerSetDeviceMatchingMultiple( IOHIDManagerRef manager, CFArrayRef multiple) {
-	printf("IOHIDManagerSetDeviceMatchingMultiple\n");
-}
-
-void IOHIDManagerUnscheduleFromRunLoop( IOHIDManagerRef manager, CFRunLoopRef runLoop, CFStringRef runLoopMode) {
-	printf("IOHIDManagerUnscheduleFromRunLoop\n");
-}
-
-IOReturn IOHIDDeviceOpen( IOHIDDeviceRef device, IOOptionBits options) {
-	printf("IOHIDDeviceOpen %08x\n", (unsigned int) device);
-	return kIOReturnSuccess;
-}
-
-CFNumberRef makeUShort(unsigned short value) {
-	return CFNumberCreate(NULL, kCFNumberShortType, &value);
-}
-
-CFTypeRef IOHIDDeviceGetProperty( IOHIDDeviceRef device, CFStringRef key) {
-	printf("IOHIDDeviceGetProperty('%s')\n", CFStringGetCStringPtr(key, kCFStringEncodingMacRoman));
-	if(CFStringCompare(key, CFSTR("VendorID"), 0) == 0) {
-		return makeUShort(0x54c);
-	} else if(CFStringCompare(key, CFSTR("ProductID"), 0) == 0) {
-		return makeUShort(0x5c4);
-	} else if(CFStringCompare(key, CFSTR("Transport"), 0) == 0) {
-		return CFSTR("USB");
-	} else if(CFStringCompare(key, CFSTR("VersionNumber"), 0) == 0) {
-		return makeUShort(0x100);
+// function to create matching dictionary
+static CFMutableDictionaryRef hu_CreateDeviceMatchingDictionary( UInt32 inUsagePage, UInt32 inUsage )
+{
+    // create a dictionary to add usage page/usages to
+    CFMutableDictionaryRef result = CFDictionaryCreateMutable(
+                                                              kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks );
+    if ( result ) {
+        if ( inUsagePage ) {
+            // Add key for device type to refine the matching dictionary.
+            CFNumberRef pageCFNumberRef = CFNumberCreate(
+                                                         kCFAllocatorDefault, kCFNumberIntType, &inUsagePage );
+            if ( pageCFNumberRef ) {
+                CFDictionarySetValue( result,
+                                     CFSTR( kIOHIDDeviceUsagePageKey ), pageCFNumberRef );
+                CFRelease( pageCFNumberRef );
+                
+                // note: the usage is only valid if the usage page is also defined
+                if ( inUsage ) {
+                    CFNumberRef usageCFNumberRef = CFNumberCreate(
+                                                                  kCFAllocatorDefault, kCFNumberIntType, &inUsage );
+                    if ( usageCFNumberRef ) {
+                        CFDictionarySetValue( result,
+                                             CFSTR( kIOHIDDeviceUsageKey ), usageCFNumberRef );
+                        CFRelease( usageCFNumberRef );
+                    } else {
+                        fprintf( stderr, "%s: CFNumberCreate( usage ) failed.", __PRETTY_FUNCTION__ );
+                    }
+                }
+            } else {
+                fprintf( stderr, "%s: CFNumberCreate( usage page ) failed.", __PRETTY_FUNCTION__ );
+            }
+        }
+    } else {
+        fprintf( stderr, "%s: CFDictionaryCreateMutable failed.", __PRETTY_FUNCTION__ );
     }
-	return NULL;
-}
+    return result;
+}   // hu_CreateDeviceMatchingDictionary
 
-IOReturn IOHIDDeviceGetReport( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, uint8_t *report, CFIndex *pReportLength) {
-	printf("IOHIDDeviceGetReport(0x%x, %i)\n", (int) reportID, pReportLength == NULL ? 0 : (int) *pReportLength);
-	if(reportID == 0x12) {
-		uint8_t report12[] = {0x12, 0x8B, 0x09, 0x07, 0x6D, 0x66, 0x1C, 0x08, 0x25, 0x00, 0xAC, 0x9E, 0x17, 0x94, 0x05, 0xB0};
-		assert(pReportLength != NULL && *pReportLength >= sizeof(report12));
-		memcpy(report, report12, sizeof(report12));
-	} else if(reportID == 0xa3) {
-		uint8_t reporta3[] = {0xA3, 0x41, 0x75, 0x67, 0x20, 0x20, 0x33, 0x20, 0x32, 0x30, 0x31, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x37, 0x3A, 0x30, 0x31, 0x3A, 0x31, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x31, 0x03, 0x00, 0x00, 0x00, 0x49, 0x00, 0x05, 0x00, 0x00, 0x80, 0x03, 0x00};
-		assert(pReportLength != NULL && *pReportLength >= sizeof(reporta3));
-		memcpy(report, reporta3, sizeof(reporta3));
-	} else if(reportID == 0x02) {
-		uint8_t report02[] = {0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x87, 0x22, 0x7B, 0xDD, 0xB2, 0x22, 0x47, 0xDD, 0xBD, 0x22, 0x43, 0xDD, 0x1C, 0x02, 0x1C, 0x02, 0x7F, 0x1E, 0x2E, 0xDF, 0x60, 0x1F, 0x4C, 0xE0, 0x3A, 0x1D, 0xC6, 0xDE, 0x08, 0x00};
-		assert(pReportLength != NULL && *pReportLength >= sizeof(report02));
-		memcpy(report, report02, sizeof(report02));
-	}
-	return kIOReturnSuccess;
-}
-
-IOReturn IOHIDDeviceSetReport( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, const uint8_t *report, CFIndex reportLength) {
-	printf("IOHIDDeviceSetReport\n");
-    NSLog(@"IOHIDDeviceSetReport type: %u", reportType);
+char * MYCFStringCopyUTF8String(CFStringRef aString) {
+    if (aString == NULL) {
+        return NULL;
+    }
     
-	return kIOReturnSuccess;
+    CFIndex length = CFStringGetLength(aString);
+    CFIndex maxSize =
+    CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+    char *buffer = (char *)malloc(maxSize);
+    if (CFStringGetCString(aString, buffer, maxSize,
+                           kCFStringEncodingUTF8)) {
+        return buffer;
+    }
+    free(buffer); // If we failed
+    return NULL;
 }
 
-#define MOUSESTEPS 10
+int reportCount = 0;
+double diffx = 0;
+double diffy = 0;
+bool leftMouseDown = false;
+bool rightMouseDown = false;
+bool startMouseWarp = false;
+
+dispatch_semaphore_t mouseSemaphore;
+
+static void Handle_IOHIDInputValueCallback(
+                                           void *          inContext,      // context from IOHIDManagerRegisterInputValueCallback
+                                           IOReturn        inResult,       // completion result for the input value operation
+                                           void *          inSender,       // the IOHIDManagerRef
+                                           IOHIDValueRef   inIOHIDValueRef // the new element value
+) {
+    IOHIDElementRef elementRef = IOHIDValueGetElement(inIOHIDValueRef);
+    uint32_t usage = IOHIDElementGetUsage(elementRef);
+    
+    CFIndex x = IOHIDValueGetIntegerValue(inIOHIDValueRef);
+    
+    dispatch_semaphore_wait(mouseSemaphore, DISPATCH_TIME_FOREVER);
+    switch(usage)
+    {
+        case 1:
+            leftMouseDown = x;
+            break;
+        case 2:
+            rightMouseDown = x;
+            break;
+        case 48: diffx = x;
+            break;
+        case 49: diffy = x;
+            break;
+    }
+    dispatch_semaphore_signal(mouseSemaphore);
+}
+
+typedef struct {
+    uint8_t id,
+    left_x, left_y,
+    right_x, right_y,
+    buttons1, buttons2, buttons3,
+    left_trigger, right_trigger,
+    unk1, unk2, unk3;
+    int16_t gyro_x, gyro_y, gyro_z;
+    int16_t accel_x, accel_y, accel_z;
+    uint8_t unk4[39];
+} PSReport;
 
 @interface HIDRunner:NSObject
 {
-	CFRunLoopRef runLoop;
-	CFStringRef runLoopMode;
-
-	IOHIDReportCallback callback;
-	void *context;
-
-	uint8_t *report;
-	CFIndex reportLength;
-
-	uint64_t ticks;
-
-	bool X, O, square, triangle, PS, touchpad, options, share,
-	L1, L2, L3, R1, R2, R3, dpadUp, dpadDown, dpadLeft, dpadRight;
-	float leftX, leftY, rightX, rightY; // -1 to 1
-
-	bool keys[256], leftMouse, rightMouse;
-	bool kicked, decayKicked;
-
-	bool mouseMoved;
-	NSPoint lastMouse;
-	CFAbsoluteTime lastMouseTime;
-	float mouseAccelX, mouseAccelY, mouseVelX, mouseVelY;
-    
-    CVDisplayLinkRef displayLink;
-    bool displayLinkStarted;
+    bool keys[256];
+    bool X, O, square, triangle, PS, touchpad, options, share,
+    L1, L2, L3, R1, R2, R3, dpadUp, dpadDown, dpadLeft, dpadRight;
+    float leftX, leftY, rightX, rightY; // -1 to 1
+    int ticks;
+    CFAbsoluteTime lastMouseTime;
+    float sensitivity;
 }
 
 @end
 
 static HIDRunner *hid;
+
+typedef void (*send_type)(id, SEL, CFIndex, uint8_t *, CFIndex);
+static send_type originalParse = NULL;
 
 #define SWAP(ocls, sel) do { \
 	id rcls = NSClassFromString(@"_TtC10RemotePlay17RPWindowStreaming"); \
@@ -155,7 +141,11 @@ static HIDRunner *hid;
 } while(0)
 
 @implementation HIDRunner
+
 + (void)load {
+    
+    mouseSemaphore = dispatch_semaphore_create(1);
+    
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		id cls = NSClassFromString(@"HIDRunner");
@@ -166,267 +156,179 @@ static HIDRunner *hid;
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (mouseUp:));
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseDown:));
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseUp:));
-	});
-}
-
--(void) startCVDisplayLink
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        displayLinkStarted = true;
-        CVReturn            error = kCVReturnSuccess;
-        CGDirectDisplayID   displayID = CGMainDisplayID();// 1
         
-        error = CVDisplayLinkCreateWithCGDisplay(displayID, &displayLink);// 2
-        if(error)
-        {
-            NSLog(@"DisplayLink created with error:%d", error);
-            displayLink = NULL;
-            return;
-        }
+        id mcls = NSClassFromString(@"DSDevice");
+        SEL mSelector = @selector(parseInputReportID:Report:Length:);
+        Method orig = class_getInstanceMethod(mcls, mSelector);
+        originalParse = (send_type) method_getImplementation(orig);
+        Method new = class_getInstanceMethod(cls, @selector(parseInputReportID:Report:Length:));
+        method_exchangeImplementations(orig, new);
         
-        error = CVDisplayLinkSetOutputCallback(displayLink,// 3
-                                               MyDisplayLinkCallback, (void *)CFBridgingRetain(self));
-        CVDisplayLinkStart(displayLink);
-    });
-}
-
-CVReturn MyDisplayLinkCallback (
-                                CVDisplayLinkRef displayLink,
-                                const CVTimeStamp *inNow,
-                                const CVTimeStamp *inOutputTime,
-                                CVOptionFlags flagsIn,
-                                CVOptionFlags *flagsOut,
-                                void *displayLinkContext)
-{
-    //NSLog(@"my display link callback!");
-    [hid kick];
-    
-    return kCVReturnSuccess;
-}
-
-- (id)initWithRunLoop:(CFRunLoopRef)_runLoop andMode:(CFStringRef)_mode {
-	hid = self = [super init];
-	runLoop = _runLoop;
-	runLoopMode = _mode;
-	ticks = 0;
-
-	for(int i = 0; i < 256; ++i)
-		keys[i] = false;
-    
-    displayLinkStarted = false;
-    
-	return self;
-}
-- (void)registerCallback:(IOHIDReportCallback)cb withContext:(void *)ctx andReport:(uint8_t *)rep withLength:(CFIndex) repLen {
-	callback = cb;
-	context = ctx;
-	report = rep;
-	reportLength = repLen;
-}
-- (void)tick {
-	uint8_t brep[] = {0x01, 0x7f, 0x81, 0x82, 0x7d, 0x08, 0x00, 0xb4, 0x00, 0x00, 0xc8, 0xad, 0xf9, 0x04, 0x00, 0xfe, 0xff, 0xfc, 0xff, 0xe5, 0xfe, 0xcb, 0x1f, 0x69, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b, 0x00, 0x00, 0x01, 0x63, 0x8b, 0x80, 0xc1, 0x2e, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00};
-
-	PSReport *prep = (PSReport *) report;
-
-	memcpy(report, brep, sizeof(brep));
-
-    [self mouseFunctionality];
-	[self mapKeys];
-    
-
-	uint8_t dpad = 8;
-	if(dpadLeft) {
-		if(dpadUp)
-			dpad = 7;
-		else if(dpadDown)
-			dpad = 5;
-		else
-			dpad = 6;
-	} else if(dpadRight) {
-		if(dpadUp)
-			dpad = 1;
-		else if(dpadDown)
-			dpad = 3;
-		else
-			dpad = 2;
-	} else if(dpadUp)
-		dpad = 0;
-	else if(dpadDown)
-		dpad = 4;
-
-	prep->buttons1 = (triangle ? (1 << 7) : 0) | (O ? (1 << 6) : 0) | (X ? (1 << 5) : 0) | (square ? (1 << 4) : 0) | dpad;
-	prep->buttons2 = (R3 ? (1 << 7) : 0) | (L3 ? (1 << 6) : 0) | (options ? (1 << 5) : 0) | (share ? (1 << 4) : 0) |
-		(R2 ? (1 << 3) : 0) | (L2 ? (1 << 2) : 0) | (R1 ? (1 << 1) : 0) | (L1 ? (1 << 0) : 0);
-	prep->buttons3 = ((ticks << 2) & 0xFF) | (touchpad ? 2 : 0) | (PS ? 1 : 0);
-	prep->left_trigger = L2 ? 255 : 0;
-	prep->right_trigger = R2 ? 255 : 0;
-	prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 128, 0), 255);
-	prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 128, 0), 255);
-	prep->right_x = (uint8_t) fmin(fmax(128 + rightX * 128, 0), 255);
-	prep->right_y = (uint8_t) fmin(fmax(128 + rightY * 128, 0), 255);
-
-	callback(context, kIOReturnSuccess, (void *)0xDEADBEEF, kIOHIDReportTypeInput, 0x01, report, 64);
-
-	//NSLog(@"Tick");
-	ticks++;
-}
-
-
-- (void)kick {
-	if(kicked)
-		return;
-	kicked = true;
-		CFRunLoopPerformBlock(runLoop, runLoopMode, ^void() {
-			kicked = false;
-			[self tick];
-		});
-}
-
-/*
-- (void)decayKick {
-	if(decayKicked)
-		return;
-	decayKicked = true;
-
-	CFRunLoopPerformBlock(runLoop, runLoopMode, ^void() {
-		decayKicked = false;
-		[self tick];
+        hid = [[HIDRunner alloc] init];
 	});
-}*/
-
-#define JOYDECAY 5
-#define DEADZONE .1
+    
+    IOHIDManagerRef managerRef = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    // Create a matching dictionary
+    CFDictionaryRef matchingCFDictRef =
+    hu_CreateDeviceMatchingDictionary( kHIDPage_GenericDesktop, kHIDUsage_GD_Mouse );
+    
+    hid->lastMouseTime = CFAbsoluteTimeGetCurrent();
+    hid->sensitivity = 6.0;
+    printf("hello world\n");
+    
+    if ( matchingCFDictRef ) {
+        // set the HID device matching dictionary
+        IOHIDManagerSetDeviceMatching( managerRef, matchingCFDictRef );
+    } else {
+        fprintf( stderr, "%s: hu_CreateDeviceMatchingDictionary failed.", __PRETTY_FUNCTION__ );
+        return;
+    }
+    
+    CFRunLoopRef runLoopRef = CFRunLoopGetCurrent();
+    IOHIDManagerScheduleWithRunLoop(managerRef, runLoopRef, kCFRunLoopDefaultMode);
+    
+    
+    IOReturn ret = IOHIDManagerOpen(managerRef, kIOHIDOptionsTypeNone);
+    
+    if(ret != kIOReturnSuccess)
+        fprintf( stderr, "%s: IOHIDManagerOpen failed.", __PRETTY_FUNCTION__ );
+    
+    //IOHIDManagerClose(managerRef, kIOHIDOptionsTypeNone);
+    
+    int context = 1;
+    IOHIDManagerRegisterInputValueCallback( managerRef, Handle_IOHIDInputValueCallback, &context );
+    printf("here");
+    //CFRunLoopRun();
+}
 
 #define DOWN(key) keys[key]
-- (void)mapKeys {
+- (uint8_t *) mapKeys: (uint8_t *) rep{
 #include "../mapKeys.h"
+    
+    uint8_t brep[] = {0x01, 0x7f, 0x81, 0x82, 0x7d, 0x08, 0x00, 0xb4, 0x00, 0x00, 0xc8, 0xad, 0xf9, 0x04, 0x00, 0xfe, 0xff, 0xfc, 0xff, 0xe5, 0xfe, 0xcb, 0x1f, 0x69, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b, 0x00, 0x00, 0x01, 0x63, 0x8b, 0x80, 0xc1, 0x2e, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00};
+    
+    PSReport *prep = (PSReport *) rep;
+    
+    memcpy(rep, brep, sizeof(brep));
+    
+    //keys
+    uint8_t dpad = 8;
+    if(dpadLeft) {
+        if(dpadUp)
+            dpad = 7;
+        else if(dpadDown)
+            dpad = 5;
+        else
+            dpad = 6;
+    } else if(dpadRight) {
+        if(dpadUp)
+            dpad = 1;
+        else if(dpadDown)
+            dpad = 3;
+        else
+            dpad = 2;
+    } else if(dpadUp)
+        dpad = 0;
+    else if(dpadDown)
+        dpad = 4;
+    
+    prep->buttons1 = (triangle ? (1 << 7) : 0) | (O ? (1 << 6) : 0) | (X ? (1 << 5) : 0) | (square ? (1 << 4) : 0) | dpad;
+    prep->buttons2 = (R3 ? (1 << 7) : 0) | (L3 ? (1 << 6) : 0) | (options ? (1 << 5) : 0) | (share ? (1 << 4) : 0) |
+    (leftMouseDown ? (1 << 3) : 0) | (rightMouseDown ? (1 << 2) : 0) | (R1 ? (1 << 1) : 0) | (L1 ? (1 << 0) : 0);
+    prep->buttons3 = ((ticks << 2) & 0xFF) | (touchpad ? 2 : 0) | (PS ? 1 : 0);
+    prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 128, 0), 255);
+    prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 128, 0), 255);
+    
+    //mouses
+    dispatch_semaphore_wait(mouseSemaphore, DISPATCH_TIME_FOREVER);
+    
+    prep->left_trigger = rightMouseDown ? 255 : 0;
+    prep->right_trigger = leftMouseDown ? 255 : 0;
+    
+    CFAbsoluteTime currTime = CFAbsoluteTimeGetCurrent();
+    float diffTimeMs = currTime - hid->lastMouseTime;
+    diffTimeMs *= 100.0f;
+    
+    hid->lastMouseTime = currTime;
+    float speedX = fabs(diffx/diffTimeMs);
+    float speedY = fabs(diffy/diffTimeMs);
+    
+    float dist = sqrtf(diffx*diffx + diffy*diffy);
+    
+    float vX = dist == 0 ? 0 : speedX / dist*diffx;
+    float vY = dist == 0 ? 0 : speedY / dist*diffy;
+    
+    vX *= hid->sensitivity;
+    vY *= hid->sensitivity;
+    
+    if(vX < 0)
+        vX = fmax(96 + vX, 0);
+    else if(vX > 0)
+        vX = fmin(160 + vX, 255);
+    else
+        vX = 128;
+    
+    if(vY < 0)
+        vY = fmax(96 + vY, 0);
+    else if(vY > 0)
+        vY = fmin(160 + vY, 255);
+    else
+        vY = 128;
+    
+    prep->right_x = (uint8_t) vX;
+    prep->right_y = (uint8_t) vY;
+    
+    //NSLog(@"\nvX: %f\n vY: %f", vX, vY);
+    diffx = diffy = 0;
+    
+    dispatch_semaphore_signal(mouseSemaphore);
+    
+    NSWindow * window = [[NSApplication sharedApplication] mainWindow];
+    NSRect f = [window frame];
+    
+    if(startMouseWarp && [[NSApplication sharedApplication] isActive])
+        CGWarpMouseCursorPosition(CGPointMake(f.origin.x + f.size.width / 2, f.origin.y + f.size.height / 2));
+    
+    
+    
+    ticks++;
+    
+    return rep;
 }
 
-- (void) mouseFunctionality
+-(void) parseInputReportID: (CFIndex) index Report: (uint8_t *) rep Length: (CFIndex) len
 {
-    hid->mouseMoved = true;
-    
-    CFAbsoluteTime curtime = CFAbsoluteTimeGetCurrent();
-    NSPoint mouse = [NSEvent mouseLocation];
-    
-    CGEventRef ourEvent = CGEventCreate(NULL);
-    NSPoint point = CGEventGetLocation(ourEvent);
-    CFRelease(ourEvent);
-    //NSLog(@"Location? x= %f, y = %f", (float)point.x, (float)point.y);
-    
-    float velX = (point.x - hid->lastMouse.x); //hid->lastMouse.x); // / (curtime - hid->lastMouseTime);
-    float velY = (point.y - hid->lastMouse.y); //hid->lastMouse.y); // / (curtime - hid->lastMouseTime);
-    
-    NSLog(@"Movement:\nX: %0.30f\nY: %0.30f", velX, velY);
-    
-    float sensitivity = 0.25;
-    
-    hid->mouseAccelX = -velX; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
-    hid->mouseAccelY = velY; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
-    hid->mouseAccelX *= sensitivity;
-    hid->mouseAccelY *= sensitivity;
-    
-    hid->lastMouseTime = curtime;
-    hid->lastMouse = point;
-    
-    if((ticks % 10) == 0)
+    if(index == 1 && len == 64)
     {
-        CGWarpMouseCursorPosition(CGPointMake(720,450));
-        hid->lastMouse.x = 720;
-        hid->lastMouse.y = 450;
+        rep = [hid mapKeys:rep];
+        //NSLog(@"Input Report ID: %lu, Length: %lu", index, len);
+        originalParse(self, @selector(parseInputReportID:Report:Length:), index, rep, len);
+    }else{
+        NSLog(@"We received a different report - ID: %lu Length: %lu", index, len);
     }
+    
 }
 
 - (void)keyDown:(NSEvent *)event {
-	//NSLog(@"down %i", [event keyCode]);
-	hid->keys[[event keyCode]] = true;
+    hid->keys[[event keyCode]] = true;
     
-    if(!displayLinkStarted)
-    {
-        [hid startCVDisplayLink];
-    }
-    
-	//[hid kick];
+    if(!startMouseWarp) startMouseWarp = true;
 }
+
+const int NumPadPlusKeyCode = 69;
+const int NumPadMinusKeyCode = 78;
+const float SensitivityIncriment = 0.1;
+
 - (void)keyUp:(NSEvent *)event {
-	//NSLog(@"up %i", [event keyCode]);
-	hid->keys[[event keyCode]] = false;
-	//[hid kick];
+    hid->keys[[event keyCode]] = false;
+    
+    if ([event keyCode] == NumPadPlusKeyCode)
+        hid->sensitivity += SensitivityIncriment;
+    if ([event keyCode] == NumPadMinusKeyCode)
+        hid->sensitivity -= SensitivityIncriment;
+    
+    if ([event keyCode] == NumPadPlusKeyCode || [event keyCode] == NumPadMinusKeyCode)
+        NSLog(@"Sensitivity: %f", hid->sensitivity);
 }
 
-/*
-- (void)mouseMoved:(NSEvent *)event {
-	NSLog(@"mouseMoved");
-	NSPoint mouse = [NSEvent mouseLocation];
-
-	if(hid->mouseMoved && (mouse.x != 720 || mouse.y != 450))
-		return;
-
-	hid->mouseMoved = true;
-
-	//NSPoint mouse = [event locationInWindow];
-
-
-	CFAbsoluteTime curtime = CFAbsoluteTimeGetCurrent();
-	float velX = (mouse.x - hid->lastMouse.x); // / (curtime - hid->lastMouseTime);
-	float velY = (mouse.y - hid->lastMouse.y); // / (curtime - hid->lastMouseTime);
-
-	float sensitivity = 5;
-
-	float xPos = mouse.x;
-	float yPos = mouse.y;
-
-	hid->mouseAccelX = -velX; //(velX - hid->mouseVelX) / (curtime - hid->lastMouseTime);
-	hid->mouseAccelY = -velY; //(velY - hid->mouseVelY) / (curtime - hid->lastMouseTime);
-	hid->mouseAccelX *= sensitivity;
-	hid->mouseAccelY *= sensitivity;
-
-	//NSLog(@"MouseX: %0.2f, MouseY: %02.f", xPos, yPos);
-
-	NSLog(@"accel %f %f", hid->mouseAccelX, hid->mouseAccelY);
-	hid->lastMouseTime = curtime;
-	hid->lastMouse = mouse;
-
-
-	if(fabs(720 - mouse.x) > 600 || fabs(450 - mouse.y) > 400)
-	{
-		CGWarpMouseCursorPosition(CGPointMake(720,450));
-		hid->lastMouse = [NSEvent mouseLocation];
-	}
-
-	//[hid kick];
-	//[hid decayKick];
-}*/
-
-- (void)mouseDown:(NSEvent *)event {
-	hid->leftMouse = true;
-	//[hid kick];
-}
-- (void)mouseUp:(NSEvent *)event {
-	hid->leftMouse = false;
-	//[hid kick];
-}
-- (void)rightMouseDown:(NSEvent *)event {
-	hid->rightMouse = true;
-	//[hid kick];
-}
-- (void)rightMouseUp:(NSEvent *)event {
-	hid->rightMouse = false;
-	//[hid kick];
-}
 @end
-
-void IOHIDManagerScheduleWithRunLoop( IOHIDManagerRef manager, CFRunLoopRef runLoop, CFStringRef runLoopMode) {
-	printf("IOHIDManagerScheduleWithRunLoop\n");
-	[[HIDRunner alloc] initWithRunLoop:runLoop andMode:runLoopMode];
-}
-
-void IOHIDDeviceScheduleWithRunLoop( IOHIDDeviceRef device, CFRunLoopRef runLoop, CFStringRef runLoopMode) {
-	printf("IOHIDDeviceScheduleWithRunLoop\n");
-}
-
-void IOHIDDeviceRegisterInputReportCallback( IOHIDDeviceRef device, uint8_t *report, CFIndex reportLength, IOHIDReportCallback callback, void *context) {
-	printf("IOHIDDeviceRegisterInputReportCallback\n");
-	[hid registerCallback:callback withContext:context andReport:report withLength:reportLength];
-}

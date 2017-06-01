@@ -56,23 +56,3 @@ with file('mapKeys.h', 'w') as fp:
 			mouseLook[k.split('.', 1)[1]] = v
 		else:
 			print 'Unknown key:', k
-
-	if mouseLook is not None:
-		if mouseLook['type'] == 'linear':
-			print >>fp, \
-'''if(mouseMoved) {{
-	{stick}X = -mouseAccelX;
-	{stick}Y = mouseAccelY;
-	mouseMoved = false;
-}} else {{
-	{stick}X /= {decay};
-	{stick}Y /= {decay};
-	if(fabs({stick}X) > {deadZone} || fabs({stick}Y) > {deadZone}) {{
-		NSLog(@"Still decaying... %f %f", {stick}X, {stick}Y);
-		//[self decayKick];
-	}} else {{
-		{stick}X = {stick}Y = 0;
-	}}
-}}'''.format(**mouseLook)
-		else:
-			print 'Unknown mouseLook type:', mouseLook
