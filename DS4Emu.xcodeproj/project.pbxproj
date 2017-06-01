@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A58E76DC1ED8F0D200AC7F06 /* FastServerSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A58E76D81ED8F0D200AC7F06 /* FastServerSocket.h */; };
-		A58E76DD1ED8F0D200AC7F06 /* FastServerSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A58E76D91ED8F0D200AC7F06 /* FastServerSocket.m */; };
-		A58E76DE1ED8F0D200AC7F06 /* FastSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A58E76DA1ED8F0D200AC7F06 /* FastSocket.h */; };
-		A58E76DF1ED8F0D200AC7F06 /* FastSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A58E76DB1ED8F0D200AC7F06 /* FastSocket.m */; };
 		A5B3C4201ED8882700746C74 /* iohid_wrap.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3C41B1ED8882700746C74 /* iohid_wrap.m */; };
 		A5B3C4251ED8884000746C74 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C4241ED8884000746C74 /* AppKit.framework */; };
 		A5B3C4271ED8884800746C74 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3C4261ED8884800746C74 /* IOKit.framework */; };
@@ -20,15 +16,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A58E76481ED8C8F900AC7F06 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		A58E764A1ED8C90F00AC7F06 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		A58E764B1ED8C90F00AC7F06 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
-		A58E764E1ED8C94200AC7F06 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = System/Library/Frameworks/AGL.framework; sourceTree = SDKROOT; };
-		A58E76511ED8CA2300AC7F06 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
-		A58E76D81ED8F0D200AC7F06 /* FastServerSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastServerSocket.h; sourceTree = "<group>"; };
-		A58E76D91ED8F0D200AC7F06 /* FastServerSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FastServerSocket.m; sourceTree = "<group>"; };
-		A58E76DA1ED8F0D200AC7F06 /* FastSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FastSocket.h; sourceTree = "<group>"; };
-		A58E76DB1ED8F0D200AC7F06 /* FastSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FastSocket.m; sourceTree = "<group>"; };
 		A5B3C40D1ED887ED00746C74 /* libDS4Emu.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libDS4Emu.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5B3C4191ED8882700746C74 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		A5B3C41A1ED8882700746C74 /* destiny.se */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destiny.se; sourceTree = "<group>"; };
@@ -60,21 +47,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A58E76541ED8DCFA00AC7F06 /* FastSocket */ = {
-			isa = PBXGroup;
-			children = (
-				A58E76D81ED8F0D200AC7F06 /* FastServerSocket.h */,
-				A58E76D91ED8F0D200AC7F06 /* FastServerSocket.m */,
-				A58E76DA1ED8F0D200AC7F06 /* FastSocket.h */,
-				A58E76DB1ED8F0D200AC7F06 /* FastSocket.m */,
-			);
-			name = FastSocket;
-			sourceTree = "<group>";
-		};
 		A5B3C4041ED887ED00746C74 = {
 			isa = PBXGroup;
 			children = (
-				A58E76541ED8DCFA00AC7F06 /* FastSocket */,
 				A5B3C40F1ED887ED00746C74 /* DS4Emu */,
 				A5B3C40E1ED887ED00746C74 /* Products */,
 				A5B3C4231ED8884000746C74 /* Frameworks */,
@@ -104,11 +79,6 @@
 		A5B3C4231ED8884000746C74 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A58E76511ED8CA2300AC7F06 /* GLUT.framework */,
-				A58E764E1ED8C94200AC7F06 /* AGL.framework */,
-				A58E764A1ED8C90F00AC7F06 /* GLKit.framework */,
-				A58E764B1ED8C90F00AC7F06 /* GLUT.framework */,
-				A58E76481ED8C8F900AC7F06 /* OpenGL.framework */,
 				A5B3C4301ED8895600746C74 /* CoreVideo.framework */,
 				A5B3C42E1ED888E100746C74 /* Quartz.framework */,
 				A5B3C42C1ED8886C00746C74 /* Foundation.framework */,
@@ -127,8 +97,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A58E76DC1ED8F0D200AC7F06 /* FastServerSocket.h in Headers */,
-				A58E76DE1ED8F0D200AC7F06 /* FastSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,7 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Users/mathewgray/Documents/DS4Emu/DS4Emu/build.sh DS4Emu/destiny.se";
+			shellScript = "DS4Emu/build.sh DS4Emu/destiny.se";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -208,8 +176,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A5B3C4201ED8882700746C74 /* iohid_wrap.m in Sources */,
-				A58E76DD1ED8F0D200AC7F06 /* FastServerSocket.m in Sources */,
-				A58E76DF1ED8F0D200AC7F06 /* FastSocket.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

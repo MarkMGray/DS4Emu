@@ -100,8 +100,6 @@ static void Handle_IOHIDInputValueCallback(
             break;
     }
     dispatch_semaphore_signal(mouseSemaphore);
-    
-    
 }
 
 typedef struct {
@@ -123,6 +121,8 @@ typedef struct {
     L1, L2, L3, R1, R2, R3, dpadUp, dpadDown, dpadLeft, dpadRight;
     float leftX, leftY, rightX, rightY; // -1 to 1
     int ticks;
+    CFAbsoluteTime lastMouseTime;
+    float sensitivity;
 }
 
 @end
@@ -172,6 +172,8 @@ static send_type originalParse = NULL;
     CFDictionaryRef matchingCFDictRef =
     hu_CreateDeviceMatchingDictionary( kHIDPage_GenericDesktop, kHIDUsage_GD_Mouse );
     
+    hid->lastMouseTime = CFAbsoluteTimeGetCurrent();
+    hid->sensitivity = 6.0;
     printf("hello world\n");
     
     if ( matchingCFDictRef ) {
@@ -237,37 +239,46 @@ static send_type originalParse = NULL;
     prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 128, 0), 255);
     prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 128, 0), 255);
     
-    
-    
     //mouses
     dispatch_semaphore_wait(mouseSemaphore, DISPATCH_TIME_FOREVER);
     
     prep->left_trigger = rightMouseDown ? 255 : 0;
     prep->right_trigger = leftMouseDown ? 255 : 0;
     
-    //we need to scale these values from -1 to 1
-    double mouseX = diffx / 5;
-    double mouseY = diffy / 5;
+    CFAbsoluteTime currTime = CFAbsoluteTimeGetCurrent();
+    float diffTimeMs = currTime - hid->lastMouseTime;
+    diffTimeMs *= 100.0f;
     
+    hid->lastMouseTime = currTime;
+    float speedX = fabs(diffx/diffTimeMs);
+    float speedY = fabs(diffy/diffTimeMs);
     
-    if(mouseX < 0)
-        mouseX = fmax(128 + mouseX * 128, 0);
-    else if(mouseX > 0)
-        mouseX = fmin(128 + mouseX * 128, 255);
+    float dist = sqrtf(diffx*diffx + diffy*diffy);
+    
+    float vX = dist == 0 ? 0 : speedX / dist*diffx;
+    float vY = dist == 0 ? 0 : speedY / dist*diffy;
+    
+    vX *= hid->sensitivity;
+    vY *= hid->sensitivity;
+    
+    if(vX < 0)
+        vX = fmax(96 + vX, 0);
+    else if(vX > 0)
+        vX = fmin(160 + vX, 255);
     else
-        mouseX = 128;
+        vX = 128;
     
-    if(mouseY < 0)
-        mouseY = fmax(128 + mouseY * 128, 0);
-    else if(mouseY > 0)
-        mouseY = fmin(128 + mouseY * 128, 255);
+    if(vY < 0)
+        vY = fmax(96 + vY, 0);
+    else if(vY > 0)
+        vY = fmin(160 + vY, 255);
     else
-        mouseY = 128;
+        vY = 128;
     
-    prep->right_x = (uint8_t) mouseX;
-    prep->right_y = (uint8_t) mouseY;
+    prep->right_x = (uint8_t) vX;
+    prep->right_y = (uint8_t) vY;
     
-    
+    //NSLog(@"\nvX: %f\n vY: %f", vX, vY);
     diffx = diffy = 0;
     
     dispatch_semaphore_signal(mouseSemaphore);
@@ -298,15 +309,26 @@ static send_type originalParse = NULL;
     
 }
 
-
-
 - (void)keyDown:(NSEvent *)event {
     hid->keys[[event keyCode]] = true;
     
     if(!startMouseWarp) startMouseWarp = true;
 }
+
+const int NumPadPlusKeyCode = 69;
+const int NumPadMinusKeyCode = 78;
+const float SensitivityIncriment = 0.1;
+
 - (void)keyUp:(NSEvent *)event {
     hid->keys[[event keyCode]] = false;
+    
+    if ([event keyCode] == NumPadPlusKeyCode)
+        hid->sensitivity += SensitivityIncriment;
+    if ([event keyCode] == NumPadMinusKeyCode)
+        hid->sensitivity -= SensitivityIncriment;
+    
+    if ([event keyCode] == NumPadPlusKeyCode || [event keyCode] == NumPadMinusKeyCode)
+        NSLog(@"Sensitivity: %f", hid->sensitivity);
 }
 
 @end
