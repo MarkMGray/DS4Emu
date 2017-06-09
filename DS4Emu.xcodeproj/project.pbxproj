@@ -29,6 +29,7 @@
 		A5B3C42C1ED8886C00746C74 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A5B3C42E1ED888E100746C74 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		A5B3C4301ED8895600746C74 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		CF2F3E6E1EEAF21B002E32DB /* owatch.se */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = owatch.se; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +73,7 @@
 				A5B3C41B1ED8882700746C74 /* iohid_wrap.m */,
 				A5B3C41E1ED8882700746C74 /* run.sh */,
 				A5B3C41F1ED8882700746C74 /* shockemu.py */,
+				CF2F3E6E1EEAF21B002E32DB /* owatch.se */,
 			);
 			path = DS4Emu;
 			sourceTree = "<group>";
@@ -166,7 +168,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DS4Emu/build.sh DS4Emu/destiny.se";
+			shellScript = "DS4Emu/build.sh DS4Emu/owatch.se";
 		};
 /* End PBXShellScriptBuildPhase section */
 
