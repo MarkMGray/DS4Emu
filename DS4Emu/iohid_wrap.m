@@ -156,6 +156,7 @@ static send_type originalParse = NULL;
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (mouseUp:));
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseDown:));
 		SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (rightMouseUp:));
+        SWAP(@"_TtC10RemotePlay17RPWindowStreaming", (flagsChanged:));
         
         id mcls = NSClassFromString(@"DSDevice");
         SEL mSelector = @selector(parseInputReportID:Report:Length:);
@@ -312,15 +313,25 @@ static send_type originalParse = NULL;
 - (void)keyDown:(NSEvent *)event {
     hid->keys[[event keyCode]] = true;
     
+    NSLog(@"Key down: %i", [event keyCode]);
+    
     if(!startMouseWarp) startMouseWarp = true;
 }
 
 const int NumPadPlusKeyCode = 69;
 const int NumPadMinusKeyCode = 78;
+const int LeftShiftKeyCode = 56;
+const int LeftCtrlKeyCode = 59;
 const float SensitivityIncriment = 0.1;
+- (void)flagsChanged:(NSEvent*) event {
+    hid->keys[LeftShiftKeyCode] = [event modifierFlags] & NSEventModifierFlagShift;
+    hid->keys[LeftCtrlKeyCode] = [event modifierFlags] & NSEventModifierFlagControl;
+}
 
 - (void)keyUp:(NSEvent *)event {
     hid->keys[[event keyCode]] = false;
+    
+    //NSLog(@"Key up: %i", [event keyCode]);
     
     if ([event keyCode] == NumPadPlusKeyCode)
         hid->sensitivity += SensitivityIncriment;
