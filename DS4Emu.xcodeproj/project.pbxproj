@@ -16,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A56680951F3F8EBD0026C46D /* r6.se */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = r6.se; sourceTree = "<group>"; };
 		A5B3C40D1ED887ED00746C74 /* libDS4Emu.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libDS4Emu.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5B3C4191ED8882700746C74 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		A5B3C41A1ED8882700746C74 /* destiny.se */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = destiny.se; sourceTree = "<group>"; };
@@ -74,6 +75,7 @@
 				A5B3C41E1ED8882700746C74 /* run.sh */,
 				A5B3C41F1ED8882700746C74 /* shockemu.py */,
 				CF2F3E6E1EEAF21B002E32DB /* owatch.se */,
+				A56680951F3F8EBD0026C46D /* r6.se */,
 			);
 			path = DS4Emu;
 			sourceTree = "<group>";
@@ -168,7 +170,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DS4Emu/build.sh DS4Emu/owatch.se";
+			shellScript = "DS4Emu/build.sh DS4Emu/r6.se\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

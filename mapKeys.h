@@ -1,3 +1,4 @@
+dpadRight = DOWN(124);
 dpadDown = DOWN(125);
 options = DOWN(48);
 X = DOWN(49);
@@ -7,7 +8,8 @@ if(DOWN(0)) leftX -= 1;
 O = DOWN(8);
 R1 = DOWN(14);
 if(DOWN(2)) leftX += 1;
-L1 = DOWN(56);
+L1 = DOWN(3);
+L3 = DOWN(56);
 dpadUp = DOWN(126);
 triangle = DOWN(12);
 PS = DOWN(35);
