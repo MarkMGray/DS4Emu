@@ -239,6 +239,8 @@ static send_type originalParse = NULL;
     prep->buttons3 = ((ticks << 2) & 0xFF) | (touchpad ? 2 : 0) | (PS ? 1 : 0);
     prep->left_x = (uint8_t) fmin(fmax(128 + leftX * 128, 0), 255);
     prep->left_y = (uint8_t) fmin(fmax(128 + leftY * 128, 0), 255);
+    prep->right_x = (uint8_t) fmin(fmax(128 + rightX * 128, 0), 255);
+    prep->right_y = (uint8_t) fmin(fmax(128 + rightY * 128, 0), 255);
     
     //mouses
     dispatch_semaphore_wait(mouseSemaphore, DISPATCH_TIME_FOREVER);
@@ -276,8 +278,8 @@ static send_type originalParse = NULL;
     else
         vY = 128;
     
-    prep->right_x = (uint8_t) vX;
-    prep->right_y = (uint8_t) vY;
+    //prep->right_x = (uint8_t) vX;
+    //prep->right_y = (uint8_t) vY;
     
     //NSLog(@"\nvX: %f\n vY: %f", vX, vY);
     diffx = diffy = 0;

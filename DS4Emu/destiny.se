@@ -4,7 +4,12 @@ a = leftX-
 s = leftY+
 d = leftX+
 
-space = X
+j = rightX+
+g = rightX-
+y = rightY-
+h = rightY+
+
+x = X
 r = square
 q = triangle
 

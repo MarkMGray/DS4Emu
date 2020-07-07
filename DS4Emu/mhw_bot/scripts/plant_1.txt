@@ -1,0 +1,19 @@
+w,1500
+j,250 # turn camera right
+w,5500
+-,500
+space,150 # stand up
+-,500
+g,550 # turn camera left
+w,5250
+-,1000 # drop animation
+mouseLeft,350 # turn camera left slightly
+w,7800
+c,150
+-,5000
+c,150
+-,5000
+c,150
+-,5000
+c,150
+-,5000

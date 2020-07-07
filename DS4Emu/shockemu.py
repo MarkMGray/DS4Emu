@@ -31,28 +31,29 @@ for i, x in enumerate(nums):
 
 def parse(data):
 	lines = (line.split('#', 1)[0].strip() for line in data.split('\n'))
-	return dict(map(string.strip, line.split('=', 1)) for line in lines if line)
+	return dict(map(str.strip, line.split('=', 1)) for line in lines if line)
 
-with file('mapKeys.h', 'w') as fp:
+with open('mapKeys.h', 'w') as fp:
 	keysticks = []
 	mouseLook = None
-	for k, v in parse(file(sys.argv[1]).read()).items():
+	for k, v in parse(open(sys.argv[1]).read()).items():
 		if k in keys or k == 'leftMouse' or k == 'rightMouse':
 			if k in keys:
 				k = 'DOWN(%i)' % keys[k]
 			if v in buttons:
-				print >>fp, '%s = %s;' % (v, k)
+				print(v, '=', k)
+				print(f"{v}={k};", file=fp)
 			elif v in axes:
 				stick = v[:-2]
 				if stick not in keysticks:
-					print >>fp, '%sX = %sY = 0;' % (stick, stick)
+					print(f'{stick}X={stick}Y = 0;', file=fp)
 					keysticks.append(stick)
-				print >>fp, 'if(%s) %s %s= 1;' % (k, v[:-1], v[-1])
+				print(f'if({k}) {v[:-1]} {v[-1]}=1;', file=fp)
 			else:
-				print 'Unknown button:', v
+				print('Unknown button:', v)
 		elif k.startswith('mouseLook.'):
 			if mouseLook is None:
 				mouseLook = dict(type='linear', deadZone='.1', decay='10', multX='1', multY='1', stick='right')
 			mouseLook[k.split('.', 1)[1]] = v
 		else:
-			print 'Unknown key:', k
+			print('Unknown key:', k)
