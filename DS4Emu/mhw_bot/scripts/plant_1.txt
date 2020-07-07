@@ -9,7 +9,7 @@ w,5250
 -,1000 # drop animation
 mouseLeft,350 # turn camera left slightly
 w,7800
-c,150
+c,150 # move this out of here we should use a find command now
 -,5000
 c,150
 -,5000
