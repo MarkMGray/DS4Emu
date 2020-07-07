@@ -54,16 +54,16 @@ class Bot:
 	def __init__(self):
 		self.scripts = {}
 		self.lost = False # are we lost yet?
-	def addScript(self, name, script, resetScript):
-		self.scripts[name] = { script, resetScript }
+	def addScript(self, name, script):
+		self.scripts[name] = { 'script': script }
 		print(self.scripts[name])
 
 	def executeScript(self, name):
-		script = self.scripts[name].script
+		script = self.scripts[name]['script']
 		if (script == None):
 			print(f'No script found for {name} - make sure you loaded it')
 			raise ReferenceError()
-		for action in self.script:
+		for action in script:
 			print(action['key'], action['value'])
 			key = action['key']
 			value = action['value']
@@ -71,18 +71,18 @@ class Bot:
 				findImageOrLost(value)
 			else:
 				duration = int(value)
-				pressKey(direction_key, duration)
-			
+				self.pressKey(key, duration)
+
 			if self.lost: # handle if we get lost searching for an image
 				print('I dont know where to go man')
-				attemptToRecoverFromLost(key, value)
-	
+				self.attemptToRecoverFromLost(key, value)
+
 	def attemptToRecoverFromLost(self, action, value):
 		if action != 'find':
 			print('We cant be lost if we are not searching for something')
 			self.lost = False
 			return
-		
+
 		print('We are attempting to recover by performing a rando walk of 30 steps')
 		i = 0
 		while i < 30:
@@ -98,7 +98,7 @@ class Bot:
 			i+=1
 		# if we never find what we are looking for we should reset if possible
 		if self.lost:
-			attemptReset()
+			self.attemptReset()
 
 	def attemptReset(self):
 		print('We are definitely lost, we should reset and staart the script over')
@@ -111,18 +111,12 @@ class Bot:
 		else:
 			print('WE ARE LOST!!!')
 			self.lost = True
-	
+
 	def pressKey(self, key, duration):
 		print(f'Pressing {key} for {duration}ms')
 		keyDown(key)
 		time.sleep(duration/1000)
 		keyUp(key)
-
-floraBot = Bot()
-floraBot.addScript('home', home_actions)
-floraBot.addScript('plant1', plant_1_actions)
-floraBot.addScript('plant2', plant_2_actions)
-floraBot.addScript('plant3', plant_3_actions)
 
 # run until ESC is pressed
 break_program = False
@@ -132,16 +126,17 @@ pause_bot = False
 def on_press(key):
 	global break_program
 	global start_bot
+	global pause_bot
 	print(key)
-	if (key == keyboard.Key.Escape):
+	if (key == keyboard.Key.esc):
 		print('ESC pressed - EXITING')
 		break_program = True
 		return false
-	if (key == keyboard.from_char('1')):
+	if (key == keyboard.KeyCode.from_char('1')):
 		print('1 Pressed - STARTING BOT')
 		start_bot = True
-	if (key == keyboard.from_char('=')):
-		print('= Pressed', if pause_bot 'Un-Pausing' else 'Pausing')
+	if (key == keyboard.KeyCode.from_char('=')):
+		print('= Pressed', 'Un-Pausing' if pause_bot else 'Pausing')
 		pause_bot = not pause_bot
 
 def check_pause():
@@ -149,29 +144,34 @@ def check_pause():
 		print('Bot paused - please un-pause with =')
 		time.sleep(2)
 
+floraBot = Bot()
+floraBot.addScript('home', home_actions)
+floraBot.addScript('plant1', plant_1_actions)
+floraBot.addScript('plant2', plant_2_actions)
+floraBot.addScript('plant3', plant_3_actions)
 with keyboard.Listener(on_press=on_press) as listener:
 	while break_program == False:
 		# run bot
 		while start_bot == False:
 			print('Bot initialized - waiting to start')
 			time.sleep(5)
-		
+
 		print('Bot starting!')
 
 		# Must be started in the home area
 		check_pause()
-		bot.executeScript('home')
+		floraBot.executeScript('home')
 		time.sleep(45) # sleep for the duration of the loading screen
 
 		check_pause()
-		bot.executeScript('plant1')
+		floraBot.executeScript('plant1')
 		time.sleep(2)
 
 		check_pause()
-		bot.executeScript('plant2')
+		floraBot.executeScript('plant2')
 
 		check_pause()
-		bot.executeScript('plant3')
+		floraBot.executeScript('plant3')
 		time.sleep(45) # sleep time for loading screens
 
 		print('Bot loop complete, starting over')
