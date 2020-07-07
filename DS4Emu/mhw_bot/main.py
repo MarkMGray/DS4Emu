@@ -96,7 +96,7 @@ class Bot:
 				self.lost = false
 				return
 			i+=1
-		
+		# if we never find what we are looking for we should reset if possible
 		if self.lost:
 			attemptReset()
 
@@ -172,6 +172,7 @@ with keyboard.Listener(on_press=on_press) as listener:
 
 		check_pause()
 		bot.executeScript('plant3')
+		time.sleep(45) # sleep time for loading screens
 
 		print('Bot loop complete, starting over')
 	listener.join()
