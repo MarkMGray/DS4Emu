@@ -11,21 +11,35 @@ pyautogui.FAILSAFE = True # Move mouse to top left to stop PyAutoGui
 step = 0
 images = list(range(1,9))
 
+def clean_line(line):
+	return line.split('#')[0].strip('\n')
+
 def parse_script(fileName):
 	file = open(fileName, 'r')
 	lines = file.readlines()
 	actions = []
-	for line in lines:
-		arr = line.split('#')[0].strip('\n').split(',')
+	for i in range(len(lines)):
+		line = lines[i]
+		arr = clean_line(line).split(',')
 		if len(arr) <= 1:
-			break
-		actions.append({ 'key': arr[0], 'value': arr[1] })
+			continue
+		if (arr[0] == 'findDo' or arr[0] == 'doWhileNot' or arr[0] == 'doWhile'):
+			endIndex = lines.index(f'endFind,{arr[1]}\n', i)
+			subActions = list(map(clean_line, lines[i+1:endIndex]))
+			print(subActions)
+			print(endIndex)
+			for j in range(i+1, endIndex+1):
+				lines[j] = ''
+			actions.append({ 'key': arr[0], 'value': arr[1], 'success': subActions })
+		else:
+			actions.append({ 'key': arr[0], 'value': arr[1] })
 	return actions
 
 home_actions = parse_script('scripts/home_script.txt')
 plant_1_actions = parse_script('scripts/plant_1.txt')
 plant_2_actions = parse_script('scripts/plant_2.txt')
 plant_3_actions = parse_script('scripts/plant_3.txt')
+complete_actions = parse_script('scripts/complete_quest.txt')
 
 walk_directions = [ 'w', 'a', 's', 'd']
 
@@ -56,7 +70,6 @@ class Bot:
 		self.lost = False # are we lost yet?
 	def addScript(self, name, script):
 		self.scripts[name] = { 'script': script }
-		print(self.scripts[name])
 
 	def executeScript(self, name):
 		script = self.scripts[name]['script']
@@ -67,6 +80,30 @@ class Bot:
 			print(action['key'], action['value'])
 			key = action['key']
 			value = action['value']
+			if key == 'findDo':
+				pos = imagesearch(f'./frozen_flora_bot_phots/{value}', 0.8)
+				if pos[0] != -1:
+					for subAction in action['success']:
+						subActionArr = subAction.split(',')
+						self.pressKey(subActionArr[0], int(subActionArr[1]))
+				continue
+			if key == 'doWhileNot':
+				pos = imagesearch(f'./frozen_flora_bot_phots/{value}', 0.8)
+				while pos[0] == -1:
+					for subAction in action['success']:
+						subActionArr = subAction.split(',')
+						self.pressKey(subActionArr[0], int(subActionArr[1]))
+					pos = imagesearch(f'./frozen_flora_bot_phots/{value}', 0.8)
+				continue
+			if key == 'doWhile':
+				pos = imagesearch(f'./frozen_flora_bot_phots/{value}', 0.8)
+				print(action)
+				while pos[0] != -1:
+					for subAction in action['success']:
+						subActionArr = subAction.split(',')
+						self.pressKey(subActionArr[0], int(subActionArr[1]))
+					pos = imagesearch(f'./frozen_flora_bot_phots/{value}', 0.8)
+				continue
 			if key == 'find': # find an image in screen or we are lost!
 				self.findImageOrLost(value)
 			else:
@@ -119,6 +156,12 @@ class Bot:
 		time.sleep(duration/1000)
 		keyUp(key)
 
+	def isQuestComplete(self):
+		pos = imagesearch('./frozen_flora_bot_phots/scaled_complete_icon.png', 0.8)
+		if (pos[0] != -1):
+			return True
+		return False
+
 # run until ESC is pressed
 break_program = False
 start_bot = False
@@ -145,11 +188,16 @@ def check_pause():
 		print('Bot paused - please un-pause with =')
 		time.sleep(2)
 
+# pos = imagesearch('./frozen_flora_bot_phots/assigned_selected.png', 0.8)
+# pyautogui.moveTo(pos[0], pos[1], 0.5)
+# print(pos[0], pos[1])
+
 floraBot = Bot()
 floraBot.addScript('home', home_actions)
 floraBot.addScript('plant1', plant_1_actions)
 floraBot.addScript('plant2', plant_2_actions)
 floraBot.addScript('plant3', plant_3_actions)
+floraBot.addScript('complete_quest', complete_actions)
 with keyboard.Listener(on_press=on_press) as listener:
 	while break_program == False:
 		# run bot
@@ -158,24 +206,35 @@ with keyboard.Listener(on_press=on_press) as listener:
 			time.sleep(5)
 
 		print('Bot starting!')
-
 		# Must be started in the home area
 		check_pause()
-		#floraBot.executeScript('home')
-		#time.sleep(90) # sleep for the duration of the loading screen
+		# floraBot.executeScript('home')
+		# time.sleep(120) # sleep for the duration of the loading screen
 
 		check_pause()
-		# floraBot.executeScript('plant1')
-		# time.sleep(2)
+		floraBot.executeScript('plant1')
+		time.sleep(2)
+
+		if floraBot.isQuestComplete():
+			floraBot.executeScript('complete_quest')
+			continue
 
 		check_pause()
-		# floraBot.executeScript('plant2')
+		floraBot.executeScript('plant2')
 
-		# check_pause()
-		# floraBot.executeScript('plant3')
-		# time.sleep(45) # sleep time for loading screens
+		if floraBot.isQuestComplete():
+			floraBot.executeScript('complete_quest')
+			continue
 
-		# todo collect rewards and sleep
+		check_pause()
+		floraBot.executeScript('plant3')
+		time.sleep(45) # sleep time for loading screens
+
+		if floraBot.isQuestComplete():
+			floraBot.executeScript('complete_quest')
+			continue
+		else:
+			print('Oh no! we are lost!')
 
 		print('Bot loop complete, starting over')
 	listener.join()
