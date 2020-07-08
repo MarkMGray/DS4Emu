@@ -1,11 +1,3 @@
-doWhileNot,gather_3.png
--,500
-w,150
-endFind,gather_3.png
-doWhile,gather_3.png
-c,150
--,5000
-endFind,gather_3.png
 w,1500
 -,250
 j,250 # turn camera right
