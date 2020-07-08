@@ -1,37 +1,46 @@
 w,1500 # walk to the quest board
 d,1500
-s,500
-space,150 # select the quest board
--,1000
-space,150 # select post quest and the right quest
--,1000
-space,150 # select master rank
--,1000
+-,150
+s,550
+-,5000
+space,50 # select the quest board
+-,5000
+space,50 # select post quest and the right quest
+-,5000
+space,50 # select master rank
+-,5000
 c,150 # back out to reset options
--,1000
-space,150
--,1000
-down,150
-down,150
-down,150
-space,150 # select flora frostbite
-down,150
-down,150
+-,2500
+space,50 # select master rank again
+-,2500
+down,50
+-,150
+down,50
+-,150
+down,50
+-,5000
+space,150 # select event
+-,5000
+down,50 # select flora frostbite
+-,150
+down,50
+-,150
 space,150
 -,1500
 space,150
 -,1500
-down,150
-down,150
+down,50
+-,150
+down,50
 -,500
 space,150
 -,1500
 space,150
--,40000 # sleep while loading - todo find a way to watch for start
+-,120000 # sleep while loading - todo find a way to watch for start
 t,150 # touch pad to open quest
--,1000
-s,150 # move down to "depart now"
--,1500
+-,3000
+s,50 # move down to "depart now"
+-,2500
 space,150 # confirm depart
--,1000
+-,2500
 space,150

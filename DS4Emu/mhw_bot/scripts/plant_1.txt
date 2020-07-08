@@ -1,14 +1,17 @@
 w,1500
+-,250
 j,250 # turn camera right
-w,5500
+-,250
+w,6000
 -,500
 space,150 # stand up
 -,500
 g,550 # turn camera left
-w,5250
+w,5500
 -,1000 # drop animation
-mouseLeft,350 # turn camera left slightly
+g,75 # turn camera left slightly
 w,7800
+find,gather_3.png
 c,150 # move this out of here we should use a find command now
 -,5000
 c,150

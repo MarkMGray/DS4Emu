@@ -68,7 +68,7 @@ class Bot:
 			key = action['key']
 			value = action['value']
 			if key == 'find': # find an image in screen or we are lost!
-				findImageOrLost(value)
+				self.findImageOrLost(value)
 			else:
 				duration = int(value)
 				self.pressKey(key, duration)
@@ -85,13 +85,14 @@ class Bot:
 
 		print('We are attempting to recover by performing a rando walk of 30 steps')
 		i = 0
+		filePath = f'./frozen_flora_bot_phots/{value}'
 		while i < 30:
-			pos = imagesearch_numLoop(value, 0.25, 5, 0.5)
+			pos = imagesearch_numLoop(filePath, 0.25, 5, 0.7)
 			if pos[0] == -1: # step
 				print('stepping')
 				direction_key = walk_directions[random.randint(0, len(walk_directions) - 1)]
 				duration = random.randint(200, 350)
-				pressKey(direction_key, duration)
+				self.pressKey(direction_key, duration)
 			else:
 				self.lost = false
 				return
@@ -105,7 +106,7 @@ class Bot:
 
 	def findImageOrLost(self, imageName): # image search for the image name and if we find it keep going else we are lost!
 		filePath = f'./frozen_flora_bot_phots/{imageName}'
-		pos = imagesearch_numLoop(filePath, 1, 20, 0.55)
+		pos = imagesearch_numLoop(filePath, 1, 20, 0.75)
 		if (pos[0] != -1):
 			print('We found it - ', pos[0], pos[1])
 		else:
@@ -153,26 +154,28 @@ with keyboard.Listener(on_press=on_press) as listener:
 	while break_program == False:
 		# run bot
 		while start_bot == False:
-			print('Bot initialized - waiting to start')
+			print('Bot initialized - waiting to start - Press 1')
 			time.sleep(5)
 
 		print('Bot starting!')
 
 		# Must be started in the home area
 		check_pause()
-		floraBot.executeScript('home')
-		time.sleep(45) # sleep for the duration of the loading screen
+		#floraBot.executeScript('home')
+		#time.sleep(90) # sleep for the duration of the loading screen
 
 		check_pause()
-		floraBot.executeScript('plant1')
-		time.sleep(2)
+		# floraBot.executeScript('plant1')
+		# time.sleep(2)
 
 		check_pause()
-		floraBot.executeScript('plant2')
+		# floraBot.executeScript('plant2')
 
-		check_pause()
-		floraBot.executeScript('plant3')
-		time.sleep(45) # sleep time for loading screens
+		# check_pause()
+		# floraBot.executeScript('plant3')
+		# time.sleep(45) # sleep time for loading screens
+
+		# todo collect rewards and sleep
 
 		print('Bot loop complete, starting over')
 	listener.join()
